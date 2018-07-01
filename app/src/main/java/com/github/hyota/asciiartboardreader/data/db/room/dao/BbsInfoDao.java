@@ -16,6 +16,12 @@ public interface BbsInfoDao {
     @Query("SELECT * FROM bbs_info ORDER BY sort ASC")
     List<BbsInfoEntity> findAll();
 
+    @Query("SELECT * FROM bbs_info WHERE scheme = :scheme AND host = :host AND category = :category AND directory = :directory")
+    BbsInfoEntity findByUrl(String scheme, String host, String category, String directory);
+
+    @Query("SELECT * FROM bbs_info WHERE title = :title")
+    BbsInfoEntity findByTitle(String title);
+
     @Insert
     @Transaction
     void insert(BbsInfoEntity... entities);

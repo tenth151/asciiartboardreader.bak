@@ -12,27 +12,27 @@ public class BbsInfo {
     @NonNull
     private String scheme;
     @NonNull
-    private String server;
+    private String host;
     @NonNull
     private String category;
     @Nullable
     private String directory;
     private long sort;
 
-    public BbsInfo(@NonNull String title, @NonNull String scheme, @NonNull String server, @NonNull String category, @Nullable String directory) {
+    public BbsInfo(@NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
         this.id = NEW_BBS_INFO_ID;
         this.title = title;
         this.scheme = scheme;
-        this.server = server;
+        this.host = host;
         this.category = category;
         this.directory = directory;
     }
 
-    public BbsInfo(long id, @NonNull String title, @NonNull String scheme, @NonNull String server, @NonNull String category, @Nullable String directory, long sort) {
+    public BbsInfo(long id, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, long sort) {
         this.id = id;
         this.title = title;
         this.scheme = scheme;
-        this.server = server;
+        this.host = host;
         this.category = category;
         this.directory = directory;
         this.sort = sort;
@@ -53,8 +53,8 @@ public class BbsInfo {
     }
 
     @NonNull
-    public String getServer() {
-        return server;
+    public String getHost() {
+        return host;
     }
 
     @NonNull

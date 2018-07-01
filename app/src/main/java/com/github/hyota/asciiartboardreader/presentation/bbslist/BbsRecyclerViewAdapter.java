@@ -12,20 +12,27 @@ import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListFragment.OnBbsSelectListener;
-import com.github.hyota.asciiartboardreader.presentation.bbslist.dummy.DummyContent.DummyItem;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 public class BbsRecyclerViewAdapter extends RecyclerView.Adapter<BbsRecyclerViewAdapter.ViewHolder> {
 
     private final List<BbsInfo> items;
-    private final OnBbsSelectListener listener;
+    private final OnBbsClickListener onClickListener;
+    private final OnBbsLongClickListener onLongClickListener;
 
-    public BbsRecyclerViewAdapter(List<BbsInfo> items, BbsListFragment.OnBbsSelectListener listener) {
+    public interface OnBbsClickListener {
+        void onClick(@NonNull BbsInfo bbsInfo);
+    }
+
+    public interface OnBbsLongClickListener {
+        void onLongClick(@NonNull BbsInfo bbsInfo);
+    }
+
+    public BbsRecyclerViewAdapter(List<BbsInfo> items, OnBbsClickListener onClickListener, OnBbsLongClickListener onLongClickListener) {
         this.items = items;
-        this.listener = listener;
+        this.onClickListener = onClickListener;
+        this.onLongClickListener = onLongClickListener;
     }
 
     @NonNull
@@ -41,15 +48,21 @@ public class BbsRecyclerViewAdapter extends RecyclerView.Adapter<BbsRecyclerView
         BbsInfo item = items.get(position);
         holder.item = item;
         holder.title.setText(item.getTitle());
-        holder.url.setText(Stream.of(item.getScheme(), item.getServer(), item.getCategory(), item.getDirectory())
+        holder.url.setText(Stream.of(item.getScheme(), item.getHost(), item.getCategory(), item.getDirectory())
                 .filter(str -> str != null)
                 .collect(Collectors.joining("/"))
         );
 
         holder.view.setOnClickListener(view -> {
-            if (null != listener) {
-                listener.onBbsSelect(holder.item);
+            if (onClickListener != null) {
+                onClickListener.onClick(holder.item);
             }
+        });
+        holder.view.setOnLongClickListener(view -> {
+            if (onLongClickListener != null) {
+                onLongClickListener.onLongClick(holder.item);
+            }
+            return true;
         });
     }
 

@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
         indices = {
                 @Index(value = {
                         "scheme",
-                        "server",
+                        "host",
                         "category",
                         "directory"
                 }, unique = true),
@@ -24,17 +24,17 @@ public class BbsInfoEntity {
     @NonNull
     private String scheme;
     @NonNull
-    private String server;
+    private String host;
     @NonNull
     private String category;
     @Nullable
     private String directory;
     private long sort;
 
-    public BbsInfoEntity(@NonNull String title, @NonNull String scheme, @NonNull String server, @NonNull String category, @Nullable String directory, long sort) {
+    public BbsInfoEntity(@NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, long sort) {
         this.title = title;
         this.scheme = scheme;
-        this.server = server;
+        this.host = host;
         this.category = category;
         this.directory = directory;
         this.sort = sort;
@@ -67,12 +67,12 @@ public class BbsInfoEntity {
     }
 
     @NonNull
-    public String getServer() {
-        return server;
+    public String getHost() {
+        return host;
     }
 
-    public void setServer(@NonNull String server) {
-        this.server = server;
+    public void setHost(@NonNull String host) {
+        this.host = host;
     }
 
     @NonNull

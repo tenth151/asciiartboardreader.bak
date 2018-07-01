@@ -10,7 +10,7 @@ import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListPresente
 import dagger.Module;
 import dagger.Provides;
 
-@Module(subcomponents = BbsListFragmentSubcomponent.class)
+@Module
 public class BbsListFragmentModule {
 
     @FragmentScope

@@ -12,11 +12,19 @@ public interface BbsListContract {
 
         void setData(@NonNull List<BbsInfo> bbsInfoList);
 
+        void showAddBbsDialog();
+
+        void showEditBbsDialog(long id, long sort, @NonNull String title, @NonNull String url);
+
     }
 
     interface Presenter {
 
-        void onCreateView();
+        void load();
+
+        void onAddButtonClick();
+
+        void onBbsLongClick(@NonNull BbsInfo bbsInfo);
 
     }
 
