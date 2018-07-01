@@ -21,18 +21,22 @@ import com.github.hyota.asciiartboardreader.presentation.boardlist.dummy.DummyCo
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 
 public class MainActivity extends AppCompatActivity
-        implements HasSupportFragmentInjector, NavigationView.OnNavigationItemSelectedListener, BbsListFragment.OnBoardSelectListener {
+        implements MainContract.View, HasSupportFragmentInjector, NavigationView.OnNavigationItemSelectedListener, BbsListFragment.OnBoardSelectListener {
 
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
+    @Inject
+    MainContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);

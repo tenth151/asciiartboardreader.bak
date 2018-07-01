@@ -12,15 +12,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.hyota.asciiartboardreader.R;
+import com.github.hyota.asciiartboardreader.presentation.BbsListContract;
 import com.github.hyota.asciiartboardreader.presentation.boardlist.dummy.DummyContent;
 import com.github.hyota.asciiartboardreader.presentation.boardlist.dummy.DummyContent.DummyItem;
+
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 
 /**
  * 板一覧
  */
-public class BbsListFragment extends Fragment {
+public class BbsListFragment extends Fragment implements BbsListContract.View {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
+
+    @Inject
+    BbsListContract.Presenter presenter;
+
     private int mColumnCount = 1;
     private OnBoardSelectListener listener;
 
@@ -39,6 +48,7 @@ public class BbsListFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        AndroidSupportInjection.inject(this);
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {

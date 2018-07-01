@@ -10,7 +10,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class MyApplication extends DaggerApplication {
 
-
     @Override
     public void onCreate() {
         super.onCreate();

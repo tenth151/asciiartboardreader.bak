@@ -1,0 +1,33 @@
+package com.github.hyota.asciiartboardreader.data.db.room.dao;
+
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Transaction;
+import android.arch.persistence.room.Update;
+
+import com.github.hyota.asciiartboardreader.data.db.room.entity.BbsInfoEntity;
+
+import java.util.List;
+
+@Dao
+public interface BbsInfoDao {
+
+    @Query("SELECT * FROM bbs_info ORDER BY sort ASC")
+    List<BbsInfoEntity> findAll();
+
+    @Insert
+    @Transaction
+    void insert(BbsInfoEntity... entities);
+
+    @Update
+    void update(BbsInfoEntity entity);
+
+    @Query("DELETE FROM bbs_info WHERE id = :id")
+    @Transaction
+    void delete(long id);
+
+    @Query("SELECT MAX(sort) FROM bbs_info")
+    Long maxSort();
+
+}
