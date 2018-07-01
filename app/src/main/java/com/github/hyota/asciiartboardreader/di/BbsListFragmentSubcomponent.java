@@ -1,6 +1,6 @@
 package com.github.hyota.asciiartboardreader.di;
 
-import com.github.hyota.asciiartboardreader.presentation.boardlist.BbsListFragment;
+import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListFragment;
 
 import dagger.Subcomponent;
 import dagger.android.AndroidInjector;

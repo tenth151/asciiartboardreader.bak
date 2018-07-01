@@ -1,4 +1,4 @@
-package com.github.hyota.asciiartboardreader.presentation.boardlist.dummy;
+package com.github.hyota.asciiartboardreader.presentation.bbslist.dummy;
 
 import java.util.ArrayList;
 import java.util.HashMap;

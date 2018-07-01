@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_marginBottom="5dp"
+    android:layout_marginTop="5dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/item_number"
+        android:id="@+id/text_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_marginEnd="@dimen/text_margin"
+        android:layout_marginStart="@dimen/text_margin"
+        android:text="【R-18】無触蹌踉童帝 ◆CDXOg0zb8EのVault111　936スレ目"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/text_url"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_marginEnd="@dimen/text_margin"
+        android:layout_marginStart="@dimen/text_margin"
+        android:text="http://jbbs.shitaraba.net/bbs/rawmode.cgi/internet/3408/1529984504/"
+        android:textAppearance="?attr/textAppearanceListItemSmall"
+        android:textSize="12sp" />
+
 </LinearLayout>

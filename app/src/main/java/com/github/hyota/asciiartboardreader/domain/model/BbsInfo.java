@@ -17,14 +17,25 @@ public class BbsInfo {
     private String category;
     @Nullable
     private String directory;
+    private long sort;
 
-    public BbsInfo(long id, @NonNull String title, @NonNull String scheme, @NonNull String server, @NonNull String category, @Nullable String directory) {
+    public BbsInfo(@NonNull String title, @NonNull String scheme, @NonNull String server, @NonNull String category, @Nullable String directory) {
+        this.id = NEW_BBS_INFO_ID;
+        this.title = title;
+        this.scheme = scheme;
+        this.server = server;
+        this.category = category;
+        this.directory = directory;
+    }
+
+    public BbsInfo(long id, @NonNull String title, @NonNull String scheme, @NonNull String server, @NonNull String category, @Nullable String directory, long sort) {
         this.id = id;
         this.title = title;
         this.scheme = scheme;
         this.server = server;
         this.category = category;
         this.directory = directory;
+        this.sort = sort;
     }
 
     public long getId() {
@@ -54,5 +65,13 @@ public class BbsInfo {
     @Nullable
     public String getDirectory() {
         return directory;
+    }
+
+    public long getSort() {
+        return sort;
+    }
+
+    public void setSort(long sort) {
+        this.sort = sort;
     }
 }

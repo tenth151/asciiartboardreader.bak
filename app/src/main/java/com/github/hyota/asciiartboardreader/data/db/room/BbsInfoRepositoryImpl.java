@@ -30,7 +30,7 @@ public class BbsInfoRepositoryImpl implements BbsInfoRepository {
     @Override
     public Single<List<BbsInfo>> findAll() {
         return Single.create(e -> e.onSuccess(Stream.of(dao.findAll())
-                .map(entity -> new BbsInfo(entity.getId(), entity.getTitle(), entity.getScheme(), entity.getServer(), entity.getCategory(), entity.getDirectory()))
+                .map(entity -> new BbsInfo(entity.getId(), entity.getTitle(), entity.getScheme(), entity.getServer(), entity.getCategory(), entity.getDirectory(), entity.getSort()))
                 .collect(Collectors.toList())));
     }
 
@@ -38,10 +38,15 @@ public class BbsInfoRepositoryImpl implements BbsInfoRepository {
     @Override
     public Completable save(@NonNull BbsInfo bbsInfo) {
         return Completable.create(e -> {
-            BbsInfoEntity entity = new BbsInfoEntity(bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getServer(), bbsInfo.getCategory(), bbsInfo.getDirectory(), dao.maxSort());
             if (bbsInfo.getId() == BbsInfo.NEW_BBS_INFO_ID) {
+                Long maxSort = dao.maxSort();
+                if (maxSort == null) {
+                    maxSort = 0L;
+                }
+                BbsInfoEntity entity = new BbsInfoEntity(bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getServer(), bbsInfo.getCategory(), bbsInfo.getDirectory(), maxSort);
                 dao.insert(entity);
             } else {
+                BbsInfoEntity entity = new BbsInfoEntity(bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getServer(), bbsInfo.getCategory(), bbsInfo.getDirectory(), bbsInfo.getSort());
                 entity.setId(bbsInfo.getId());
                 dao.update(entity);
             }

@@ -16,8 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.hyota.asciiartboardreader.R;
-import com.github.hyota.asciiartboardreader.presentation.boardlist.BbsListFragment;
-import com.github.hyota.asciiartboardreader.presentation.boardlist.dummy.DummyContent;
+import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
+import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListFragment;
+import com.github.hyota.asciiartboardreader.presentation.bbslist.dummy.DummyContent;
 
 import javax.inject.Inject;
 
@@ -27,7 +28,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 
 public class MainActivity extends AppCompatActivity
-        implements MainContract.View, HasSupportFragmentInjector, NavigationView.OnNavigationItemSelectedListener, BbsListFragment.OnBoardSelectListener {
+        implements MainContract.View, HasSupportFragmentInjector, NavigationView.OnNavigationItemSelectedListener, BbsListFragment.OnBbsSelectListener {
 
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         if (manager.findFragmentByTag("main") == null) {
             // 初回時には取得できないため初期化する
             manager.beginTransaction()
-                    .add(R.id.container, BbsListFragment.newInstance(0), "main")
+                    .add(R.id.container, BbsListFragment.newInstance(), "main")
                     .commit();
         }
 
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onBbsSelect(BbsInfo bbsInfo) {
 
     }
 }
