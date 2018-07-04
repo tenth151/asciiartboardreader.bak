@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.github.hyota.asciiartboardreader.R;
+import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.value.PermissionRequestCode;
 
 import java.util.Objects;
@@ -58,7 +59,13 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
     private long sort;
 
     public interface OnEditBbsListener {
-        void onEditBbs();
+
+        void onCreateBbs(@NonNull BbsInfo bbsInfo);
+
+        void onEditBbs(@NonNull BbsInfo bbsInfo);
+
+        void onDeleteBbs(long id);
+
     }
 
     public static void show(@NonNull FragmentManager manager) {
@@ -208,9 +215,17 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
     }
 
     @Override
-    public void succeed() {
+    public void created(@NonNull BbsInfo bbsInfo) {
         if (listener != null) {
-            listener.onEditBbs();
+            listener.onCreateBbs(bbsInfo);
+        }
+        dismiss();
+    }
+
+    @Override
+    public void edited(BbsInfo bbsInfo) {
+        if (listener != null) {
+            listener.onEditBbs(bbsInfo);
         }
         dismiss();
     }
@@ -218,7 +233,7 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
     @Override
     public void deleted() {
         if (listener != null) {
-            listener.onEditBbs();
+            listener.onDeleteBbs(id);
         }
         dismiss();
     }

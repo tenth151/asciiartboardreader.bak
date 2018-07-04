@@ -40,6 +40,7 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     private Context context;
     @Nullable
     private Unbinder unbinder;
+    private BbsRecyclerViewAdapter adapter;
     private OnBbsSelectListener listener;
 
     public interface OnBbsSelectListener {
@@ -96,7 +97,7 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     @Override
     public void setData(@NonNull List<BbsInfo> bbsInfoList) {
         Timber.d("setData");
-        BbsRecyclerViewAdapter adapter = new BbsRecyclerViewAdapter(bbsInfoList, listener::onBbsSelect, presenter::onBbsLongClick);
+        adapter = new BbsRecyclerViewAdapter(bbsInfoList, listener::onBbsSelect, presenter::onBbsLongClick);
         recyclerView.setAdapter(adapter);
     }
 
@@ -111,8 +112,32 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     }
 
     @Override
-    public void onEditBbs() {
-        presenter.load();
+    public void notifyItemInserted(int position) {
+        adapter.notifyItemInserted(position);
     }
 
+    @Override
+    public void notifyItemChanged(int position) {
+        adapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void notifyItemRemoved(int position) {
+        adapter.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void onCreateBbs(@NonNull BbsInfo bbsInfo) {
+        presenter.onCreateBbs(bbsInfo);
+    }
+
+    @Override
+    public void onEditBbs(@NonNull BbsInfo bbsInfo) {
+        presenter.onEditBbs(bbsInfo);
+    }
+
+    @Override
+    public void onDeleteBbs(long id) {
+        presenter.onDeleteBbs(id);
+    }
 }

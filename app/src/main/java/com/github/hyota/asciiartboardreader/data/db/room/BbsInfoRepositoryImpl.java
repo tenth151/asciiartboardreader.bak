@@ -64,21 +64,22 @@ public class BbsInfoRepositoryImpl implements BbsInfoRepository {
 
     @NonNull
     @Override
-    public Completable save(@NonNull BbsInfo bbsInfo) {
-        return Completable.create(e -> {
+    public Single<BbsInfo> save(@NonNull BbsInfo bbsInfo) {
+        return Single.create(e -> {
             if (bbsInfo.getId() == BbsInfo.NEW_BBS_INFO_ID) {
                 Long maxSort = dao.maxSort();
                 if (maxSort == null) {
                     maxSort = 0L;
                 }
                 BbsInfoEntity entity = new BbsInfoEntity(bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getHost(), bbsInfo.getCategory(), bbsInfo.getDirectory(), maxSort);
-                dao.insert(entity);
+                long id = dao.insert(entity);
+                e.onSuccess(new BbsInfo(id, bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getHost(), bbsInfo.getCategory(), bbsInfo.getDirectory(), maxSort));
             } else {
                 BbsInfoEntity entity = new BbsInfoEntity(bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getHost(), bbsInfo.getCategory(), bbsInfo.getDirectory(), bbsInfo.getSort());
                 entity.setId(bbsInfo.getId());
                 dao.update(entity);
+                e.onSuccess(bbsInfo);
             }
-            e.onComplete();
         });
     }
 

@@ -29,7 +29,7 @@ public class EditBbsUseCase {
     private SettingRepository settingRepository;
 
     public interface OnSuccessCallback {
-        void onSuccess();
+        void onSuccess(@NonNull BbsInfo bbsInfo, boolean create);
     }
 
     public interface OnErrorCallback {
@@ -135,14 +135,15 @@ public class EditBbsUseCase {
     private void save(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory,
                       @NonNull OnSuccessCallback onSuccessCallback, @NonNull OnErrorCallback onErrorCallback) {
         BbsInfo bbsInfo;
-        if (id != -1) {
-            bbsInfo = new BbsInfo(id, title, scheme, host, category, directory, sort);
-        } else {
+        boolean create = id == -1;
+        if (create) {
             bbsInfo = new BbsInfo(title, scheme, host, category, directory);
+        } else {
+            bbsInfo = new BbsInfo(id, title, scheme, host, category, directory, sort);
         }
         bbsInfoRepository.save(bbsInfo)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onSuccessCallback::onSuccess, throwable -> onErrorCallback.onError(throwable.getMessage()));
+                .subscribe(result -> onSuccessCallback.onSuccess(result, create), throwable -> onErrorCallback.onError(throwable.getMessage()));
     }
 }

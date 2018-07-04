@@ -24,7 +24,7 @@ public interface BbsInfoDao {
 
     @Insert
     @Transaction
-    void insert(BbsInfoEntity... entities);
+    long insert(BbsInfoEntity entity);
 
     @Update
     void update(BbsInfoEntity entity);

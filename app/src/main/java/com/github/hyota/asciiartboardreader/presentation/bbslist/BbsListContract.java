@@ -16,6 +16,12 @@ public interface BbsListContract {
 
         void showEditBbsDialog(long id, long sort, @NonNull String title, @NonNull String url);
 
+        void notifyItemInserted(int position);
+
+        void notifyItemChanged(int position);
+
+        void notifyItemRemoved(int position);
+
     }
 
     interface Presenter {
@@ -25,6 +31,12 @@ public interface BbsListContract {
         void onAddButtonClick();
 
         void onBbsLongClick(@NonNull BbsInfo bbsInfo);
+
+        void onCreateBbs(@NonNull BbsInfo bbsInfo);
+
+        void onEditBbs(@NonNull BbsInfo bbsInfo);
+
+        void onDeleteBbs(long id);
 
     }
 

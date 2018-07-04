@@ -3,6 +3,8 @@ package com.github.hyota.asciiartboardreader.presentation.bbslist;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
+
 public interface EditBbsContract {
 
     interface View {
@@ -11,7 +13,9 @@ public interface EditBbsContract {
 
         void setTitle(@Nullable String title);
 
-        void succeed();
+        void created(BbsInfo bbsInfo);
+
+        void edited(BbsInfo bbsInfo);
 
         void deleted();
 

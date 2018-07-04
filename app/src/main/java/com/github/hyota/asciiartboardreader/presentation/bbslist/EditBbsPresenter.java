@@ -28,7 +28,13 @@ public class EditBbsPresenter implements EditBbsContract.Presenter {
 
     @Override
     public void onOk(long id, long sort, @NonNull String title, @NonNull String url) {
-        editBbsUseCase.execute(id, sort, title, url, () -> view.succeed(), message -> view.showAlertMessage(message));
+        editBbsUseCase.execute(id, sort, title, url, (bbsInfo, create) -> {
+            if (create) {
+                view.created(bbsInfo);
+            } else {
+                view.edited(bbsInfo);
+            }
+        }, message -> view.showAlertMessage(message));
     }
 
     @Override

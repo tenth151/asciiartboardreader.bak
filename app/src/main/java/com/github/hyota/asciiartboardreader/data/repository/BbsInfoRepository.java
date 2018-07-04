@@ -26,7 +26,7 @@ public interface BbsInfoRepository {
     Maybe<BbsInfo> findByTitle(@NonNull String title);
 
     @NonNull
-    Completable save(@NonNull BbsInfo bbsInfo);
+    Single<BbsInfo> save(@NonNull BbsInfo bbsInfo);
 
     @NonNull
     Completable delete(long id);
