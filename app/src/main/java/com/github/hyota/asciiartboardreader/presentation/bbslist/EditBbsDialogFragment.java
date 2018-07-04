@@ -126,21 +126,18 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
                     PermissionChecker.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 presenter.onGetTitle(url.getText().toString());
             } else {
-                requestPermissions(new String[]{Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionRequestCode.GET_BBS_TITLE.ordinal());
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionRequestCode.GET_BBS_TITLE.ordinal());
             }
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                    if (PermissionChecker.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
-                            PermissionChecker.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        presenter.onOk(id, sort, title.getText().toString(), url.getText().toString());
-                    } else {
-                        requestPermissions(new String[]{Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionRequestCode.ADD_BBS.ordinal());
-                    }
+                    // NOOP
                 })
-                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss());
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
+                    // NOOP
+                });
         if (id != -1) {
             builder.setNeutralButton("削除", (dialogInterface, i) -> presenter.onDelete(id));
         }
@@ -163,8 +160,16 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
             }
         };
         dialog.setOnShowListener((DialogInterface dialogInterface) -> {
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                    .setEnabled(!TextUtils.isEmpty(url.getText()) && !TextUtils.isEmpty(title.getText()));
+            Button button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            button.setOnClickListener(v -> {
+                if (PermissionChecker.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+                        PermissionChecker.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    presenter.onOk(id, sort, title.getText().toString(), url.getText().toString());
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionRequestCode.ADD_BBS.ordinal());
+                }
+            });
+            button.setEnabled(!TextUtils.isEmpty(url.getText()) && !TextUtils.isEmpty(title.getText()));
             url.addTextChangedListener(textWatcher);
             title.addTextChangedListener(textWatcher);
         });
@@ -188,14 +193,14 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
         }
         switch (permissionRequestCode) {
             case ADD_BBS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     presenter.onOk(id, sort, title.getText().toString(), url.getText().toString());
                 } else {
                     Toast.makeText(context, "キャンセルされました", Toast.LENGTH_LONG).show();
                 }
                 break;
             case GET_BBS_TITLE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     presenter.onGetTitle(url.getText().toString());
                 } else {
                     Toast.makeText(context, "キャンセルされました", Toast.LENGTH_LONG).show();
