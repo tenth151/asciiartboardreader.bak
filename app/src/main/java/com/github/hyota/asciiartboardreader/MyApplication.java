@@ -1,7 +1,9 @@
 package com.github.hyota.asciiartboardreader;
 
+import com.facebook.stetho.Stetho;
 import com.github.hyota.asciiartboardreader.di.DaggerAppComponent;
 import com.jakewharton.threetenabp.AndroidThreeTen;
+import com.squareup.leakcanary.LeakCanary;
 
 import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;
@@ -18,6 +20,8 @@ public class MyApplication extends DaggerApplication {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+        LeakCanary.install(this);
+        Stetho.initializeWithDefaults(this);
     }
 
     @Override

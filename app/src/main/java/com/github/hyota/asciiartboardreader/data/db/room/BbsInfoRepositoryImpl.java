@@ -70,6 +70,8 @@ public class BbsInfoRepositoryImpl implements BbsInfoRepository {
                 Long maxSort = dao.maxSort();
                 if (maxSort == null) {
                     maxSort = 0L;
+                } else {
+                    maxSort++;
                 }
                 BbsInfoEntity entity = new BbsInfoEntity(bbsInfo.getTitle(), bbsInfo.getScheme(), bbsInfo.getHost(), bbsInfo.getCategory(), bbsInfo.getDirectory(), maxSort);
                 long id = dao.insert(entity);
