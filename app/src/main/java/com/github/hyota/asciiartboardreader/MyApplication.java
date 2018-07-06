@@ -19,9 +19,9 @@ public class MyApplication extends DaggerApplication {
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder().setFontAttrId(R.attr.fontPath).build());
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+            Stetho.initializeWithDefaults(this);
         }
         LeakCanary.install(this);
-        Stetho.initializeWithDefaults(this);
     }
 
     @Override
