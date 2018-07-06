@@ -1,5 +1,6 @@
 package com.github.hyota.asciiartboardreader;
 
+import com.akaita.java.rxjava2debug.RxJava2Debug;
 import com.facebook.stetho.Stetho;
 import com.github.hyota.asciiartboardreader.di.DaggerAppComponent;
 import com.jakewharton.threetenabp.AndroidThreeTen;
@@ -20,6 +21,7 @@ public class MyApplication extends DaggerApplication {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
             Stetho.initializeWithDefaults(this);
+            RxJava2Debug.enableRxJava2AssemblyTracking(new String[]{"com.github.hyota.asciiartboardreader"});
         }
         LeakCanary.install(this);
     }

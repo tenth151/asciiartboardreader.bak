@@ -3,7 +3,9 @@ package com.github.hyota.asciiartboardreader.domain.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class BbsInfo {
+import java.io.Serializable;
+
+public class BbsInfo implements Serializable {
     public static final long NEW_BBS_INFO_ID = -1;
 
     private long id;

@@ -7,6 +7,7 @@ import com.github.hyota.asciiartboardreader.presentation.bbslist.EditBbsDialogFr
 import com.github.hyota.asciiartboardreader.presentation.main.MainActivity;
 import com.github.hyota.asciiartboardreader.presentation.main.MainContract;
 import com.github.hyota.asciiartboardreader.presentation.main.MainPresenter;
+import com.github.hyota.asciiartboardreader.presentation.threadlist.ThreadListFragment;
 
 import dagger.Module;
 import dagger.Provides;
@@ -21,7 +22,6 @@ public abstract class MainActivityModule {
         return new MainPresenter(activity);
     }
 
-
     @FragmentScope
     @ContributesAndroidInjector(modules = BbsListFragmentModule.class)
     abstract BbsListFragment contributeBoardListFragment();
@@ -29,5 +29,9 @@ public abstract class MainActivityModule {
     @FragmentScope
     @ContributesAndroidInjector(modules = EditBbsDialogFragmentModule.class)
     abstract EditBbsDialogFragment contributeEditBbsDialogFragment();
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = ThreadListFragmentModule.class)
+    abstract ThreadListFragment contributeThreadListFragment();
 
 }
