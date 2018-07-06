@@ -1,15 +1,12 @@
 package com.github.hyota.asciiartboardreader.data.local;
 
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.github.hyota.asciiartboardreader.BuildConfig;
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
 import com.github.hyota.asciiartboardreader.domain.model.Setting;
-import com.github.hyota.asciiartboardreader.domain.model.Subject;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +20,7 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-public class SettingLocalRepository implements SettingRepository {
+public class SettingLocalRepository implements SettingRepository, LocalRepository {
 
     @Inject
     SettingLocalRepository() {
@@ -57,7 +54,7 @@ public class SettingLocalRepository implements SettingRepository {
     }
 
     private File getFile(@NonNull String host, @NonNull String category, @Nullable String directory) throws IOException {
-        return new File(new File(new File(Environment.getExternalStorageDirectory(), BuildConfig.APPLICATION_ID), "setting"), URLEncoder.encode(Stream.of(host, category, directory, "setting.txt").collect(Collectors.joining("/")), "UTF-8"));
+        return new File(new File(getLocalDirectory(), URLEncoder.encode(Stream.of(host, category, directory).collect(Collectors.joining("/")), "UTF-8")), "setting.txt");
     }
 
 }
