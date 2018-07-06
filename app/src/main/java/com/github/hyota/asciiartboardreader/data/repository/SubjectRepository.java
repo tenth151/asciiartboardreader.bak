@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.github.hyota.asciiartboardreader.domain.model.Subject;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadSubject;
+import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,9 +30,9 @@ public interface SubjectRepository {
     Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, @NonNull Source source);
 
     default Subject parse(@NonNull File file, @NonNull String host) throws IOException {
-        if ("jbbs.shitaraba.net".equals(host)) {
+        if (ShitarabaConstant.HOST.equals(host)) {
             try (FileInputStream fis = new FileInputStream(file);
-                 InputStreamReader isr = new InputStreamReader(fis, "EUC-JP");
+                 InputStreamReader isr = new InputStreamReader(fis, ShitarabaConstant.ENCODE);
                  BufferedReader br = new BufferedReader(isr)) {
                 List<ThreadSubject> threadSubjectList = new ArrayList<>();
                 String line;

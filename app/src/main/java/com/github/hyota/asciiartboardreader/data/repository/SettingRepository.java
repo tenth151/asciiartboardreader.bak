@@ -4,12 +4,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.github.hyota.asciiartboardreader.domain.model.Setting;
+import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -23,9 +25,9 @@ public interface SettingRepository {
 
     @NonNull
     default Setting parse(@NonNull File file, @NonNull String host) throws IOException {
-        String charset;
-        if ("jbbs.shitaraba.net".equals(host)) {
-            charset = "EUC-JP";
+        Charset charset;
+        if (ShitarabaConstant.HOST.equals(host)) {
+            charset = ShitarabaConstant.ENCODE;
         } else {
             throw new IllegalStateException("not implements"); // TODO
         }

@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
 import com.github.hyota.asciiartboardreader.domain.model.Setting;
+import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import java.io.File;
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class SettingNetworkRepository implements SettingRepository {
 
     @Override
     public Maybe<Setting> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
-        if ("jbbs.shitaraba.net".equals(host)) {
+        if (ShitarabaConstant.HOST.equals(host)) {
             if (directory == null) {
                 throw new IllegalStateException("shitaraba host must not null directory");
             }

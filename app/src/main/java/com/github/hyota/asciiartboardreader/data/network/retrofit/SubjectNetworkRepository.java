@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.github.hyota.asciiartboardreader.data.repository.SubjectRepository;
 import com.github.hyota.asciiartboardreader.domain.model.Subject;
+import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import java.io.File;
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class SubjectNetworkRepository implements SubjectRepository {
 
     @Override
     public Maybe<Subject> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
-        if ("jbbs.shitaraba.net".equals(host)) {
+        if (ShitarabaConstant.HOST.equals(host)) {
             if (directory == null) {
                 throw new IllegalStateException("shitaraba host must not null directory");
             }
