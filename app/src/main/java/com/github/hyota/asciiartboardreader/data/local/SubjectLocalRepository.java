@@ -1,10 +1,12 @@
 package com.github.hyota.asciiartboardreader.data.local;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.data.repository.SubjectRepository;
 import com.github.hyota.asciiartboardreader.domain.model.Subject;
 
@@ -22,14 +24,18 @@ import okio.Source;
 
 public class SubjectLocalRepository implements SubjectRepository, LocalRepository {
 
+    @NonNull
+    private Context context;
+
     @Inject
-    SubjectLocalRepository() {
+    SubjectLocalRepository(@NonNull Context context) {
+        this.context = context;
     }
 
     @Override
     public Maybe<Subject> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
         return Maybe.create(e -> {
-            File file = getFile(host, category, directory);
+            File file = getFile(context.getString(R.string.app_name), host, category, directory);
             if (file.exists()) {
                 e.onSuccess(parse(file, host));
             } else {
@@ -41,7 +47,7 @@ public class SubjectLocalRepository implements SubjectRepository, LocalRepositor
     @Override
     public Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, @NonNull Source source) {
         return Single.create(e -> {
-            File dst = getFile(host, category, directory);
+            File dst = getFile(context.getString(R.string.app_name), host, category, directory);
             if (!dst.getParentFile().exists() && !dst.getParentFile().mkdirs()) {
                 throw new IllegalStateException("failed mkdirs " + dst.getParentFile().getAbsolutePath());
             }
@@ -52,8 +58,8 @@ public class SubjectLocalRepository implements SubjectRepository, LocalRepositor
         });
     }
 
-    private File getFile(@NonNull String host, @NonNull String category, @Nullable String directory) throws IOException {
-        return new File(new File(getLocalDirectory(), URLEncoder.encode(Stream.of(host, category, directory).collect(Collectors.joining("/")), "UTF-8")), "subject.txt");
+    private File getFile(@NonNull String appName, @NonNull String host, @NonNull String category, @Nullable String directory) throws IOException {
+        return new File(new File(getLocalDirectory(appName), URLEncoder.encode(Stream.of(host, category, directory).collect(Collectors.joining("/")), "UTF-8")), "subject.txt");
     }
 
 }

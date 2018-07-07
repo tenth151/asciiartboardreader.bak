@@ -153,6 +153,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onThreadSelect(ThreadInfo threadInfo) {
-
+        // TODO スレ表示に遷移
     }
 }
