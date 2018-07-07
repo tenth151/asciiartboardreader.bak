@@ -9,7 +9,7 @@
         android:id="@+id/edit_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="http://xxx.xxx.xxx..."
+        android:hint="@string/hint_url"
         android:inputType="textUri" />
 
     <LinearLayout
@@ -22,14 +22,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="○○板"
+            android:hint="@string/hint_title"
             android:inputType="text" />
 
         <Button
             android:id="@+id/button_get_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="取得" />
+            android:text="@string/button_get" />
 
     </LinearLayout>
 

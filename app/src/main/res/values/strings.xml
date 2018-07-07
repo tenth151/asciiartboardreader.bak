@@ -7,6 +7,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!-- 板編集 -->
+    <string name="hint_url">URL：http://xxx.xxx.xxx&#8230;</string>
+    <string name="hint_title">板名：○○板</string>
+    <string name="button_get">取得</string>
+
     <!-- スレッド一覧 -->
     <string name="label_count">レス：</string>
     <string name="label_read_count">取得：</string>
