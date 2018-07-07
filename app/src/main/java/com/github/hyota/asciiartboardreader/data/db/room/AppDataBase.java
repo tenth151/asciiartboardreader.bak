@@ -4,15 +4,20 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
 import com.github.hyota.asciiartboardreader.data.db.room.dao.BbsInfoDao;
+import com.github.hyota.asciiartboardreader.data.db.room.dao.FavoriteThreadDao;
 import com.github.hyota.asciiartboardreader.data.db.room.entity.BbsInfoEntity;
+import com.github.hyota.asciiartboardreader.data.db.room.entity.FavoriteThreadEntity;
 
 @Database(
         entities = {
                 BbsInfoEntity.class,
+                FavoriteThreadEntity.class,
         },
         version = 1)
 public abstract class AppDataBase extends RoomDatabase {
 
     public abstract BbsInfoDao bbsInfoDao();
+
+    public abstract FavoriteThreadDao favoriteThreadDao();
 
 }

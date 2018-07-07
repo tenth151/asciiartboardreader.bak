@@ -13,7 +13,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,11 +38,15 @@ public interface SubjectRepository {
                  BufferedReader br = new BufferedReader(isr)) {
                 List<ThreadSubject> threadSubjectList = new ArrayList<>();
                 String line;
+                Set<Long> unixTimeSet = new HashSet<>();
                 while ((line = br.readLine()) != null) {
                     Matcher m = SHITARABA_PATTERN.matcher(line);
                     if (m.find()) {
                         ThreadSubject threadSubject = new ThreadSubject(Long.parseLong(m.group(1)), m.group(2), Long.parseLong(m.group(3)));
-                        threadSubjectList.add(threadSubject);
+                        if (!unixTimeSet.contains(threadSubject.getUnixTime())) {
+                            threadSubjectList.add(threadSubject);
+                            unixTimeSet.add(threadSubject.getUnixTime());
+                        }
                     }
                 }
                 return new Subject(threadSubjectList);

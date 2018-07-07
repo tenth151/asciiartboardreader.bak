@@ -13,11 +13,19 @@ public interface ThreadListContract {
 
         void setData(@NonNull List<ThreadInfo> threadInfoList);
 
+        void showConfirmDeleteFavoriteThread(@NonNull ThreadInfo threadInfo);
+
+        void notifyItemChanged(int position);
+
     }
 
     interface Presenter {
 
         void onCreate(@NonNull BbsInfo bbsInfo);
+
+        void onFavoriteStateChange(@NonNull ThreadInfo threadInfo, boolean favorite);
+
+        void onDeleteFavoriteThread(@NonNull ThreadInfo threadInfo);
 
     }
 

@@ -6,7 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
@@ -26,15 +28,22 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
     @NonNull
     private List<ThreadInfo> items;
     @Nullable
-    private OnThreadClickListener listener;
+    private OnThreadClickListener onThreadClickListener;
+    @Nullable
+    private OnFavoriteStateChangeListener onFavoriteStateChangeListener;
 
     public interface OnThreadClickListener {
         void onClick(@NonNull ThreadInfo threadInfo);
     }
 
-    ThreadListRecyclerViewAdapter(@NonNull List<ThreadInfo> items, @Nullable OnThreadClickListener listener) {
+    public interface OnFavoriteStateChangeListener {
+        void onFavoriteStateChange(@NonNull ThreadInfo threadInfo, boolean favorite);
+    }
+
+    ThreadListRecyclerViewAdapter(@NonNull List<ThreadInfo> items, @Nullable OnThreadClickListener onThreadClickListener, @NonNull OnFavoriteStateChangeListener onFavoriteStateChangeListener) {
         this.items = items;
-        this.listener = listener;
+        this.onThreadClickListener = onThreadClickListener;
+        this.onFavoriteStateChangeListener = onFavoriteStateChangeListener;
     }
 
     @NonNull
@@ -48,6 +57,19 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         ThreadInfo item = holder.item = items.get(position);
+        switch (item.getState()) {
+            case UPDATE:
+                holder.state.setImageResource(R.drawable.ic_arrow_upward);
+                break;
+            case NO_UPDATE:
+                holder.state.setImageResource(R.drawable.ic_check);
+                break;
+            case LOG:
+                holder.state.setImageResource(R.drawable.ic_arrow_downward);
+                break;
+            default:
+                holder.state.setImageBitmap(null);
+        }
         holder.no.setText(item.getNo() != null ? item.getNo().toString() : "");
         holder.title.setText(item.getTitle());
         holder.bbs.setText(item.getBbsInfo().getTitle());
@@ -58,10 +80,22 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
         holder.since.setText(item.getSince().format(THREAD_DATE_FORMATTER));
         holder.lastUpdate.setText(item.getLastUpdate() != null ? item.getLastUpdate().format(THREAD_DATE_FORMATTER) : "");
         holder.lastWrite.setText(item.getLastWrite() != null ? item.getLastWrite().format(THREAD_DATE_FORMATTER) : "");
+        holder.favorite.setOnCheckedChangeListener(null);
+        holder.favorite.setChecked(item.isFavorite());
 
         holder.view.setOnClickListener(view -> {
-            if (null != listener) {
-                listener.onClick(holder.item);
+            if (onThreadClickListener != null) {
+                onThreadClickListener.onClick(holder.item);
+            }
+        });
+
+        holder.favorite.setOnClickListener(view -> {
+            if (onFavoriteStateChangeListener != null) {
+                boolean checked = holder.favorite.isChecked();
+                if (!checked) {
+                    holder.favorite.setChecked(true);
+                }
+                onFavoriteStateChangeListener.onFavoriteStateChange(holder.item, checked);
             }
         });
     }
@@ -73,6 +107,8 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
+        @BindView(R.id.state)
+        ImageView state;
         @BindView(R.id.no)
         TextView no;
         @BindView(R.id.title)
@@ -93,6 +129,8 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
         TextView lastUpdate;
         @BindView(R.id.last_write)
         TextView lastWrite;
+        @BindView(R.id.favorite)
+        ToggleButton favorite;
         public ThreadInfo item;
 
         ViewHolder(View view) {

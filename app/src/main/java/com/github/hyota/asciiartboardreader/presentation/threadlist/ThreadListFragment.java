@@ -1,6 +1,7 @@
 package com.github.hyota.asciiartboardreader.presentation.threadlist;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
+import com.github.hyota.asciiartboardreader.domain.value.AlertDialogRequestCode;
+import com.github.hyota.asciiartboardreader.presentation.common.AlertDialogFragment;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,9 +26,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.support.AndroidSupportInjection;
 
-public class ThreadListFragment extends Fragment implements ThreadListContract.View {
+public class ThreadListFragment extends Fragment
+        implements ThreadListContract.View, AlertDialogFragment.Callback {
 
     private static final String ARG_BBS_INFO = "bbsInfo";
+
+    private static final String PARAM_THREAD_INFO = "threadInfo";
 
     @Inject
     ThreadListContract.Presenter presenter;
@@ -88,7 +94,44 @@ public class ThreadListFragment extends Fragment implements ThreadListContract.V
 
     @Override
     public void setData(@NonNull List<ThreadInfo> threadInfoList) {
-        adapter = new ThreadListRecyclerViewAdapter(threadInfoList, threadInfo -> listener.onThreadSelect(threadInfo));
+        adapter = new ThreadListRecyclerViewAdapter(threadInfoList, threadInfo -> listener.onThreadSelect(threadInfo), (threadInfo, favorite) -> presenter.onFavoriteStateChange(threadInfo, favorite));
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void showConfirmDeleteFavoriteThread(@NonNull ThreadInfo threadInfo) {
+        Bundle params = new Bundle();
+        params.putSerializable(PARAM_THREAD_INFO, threadInfo);
+        new AlertDialogFragment.Builder(this)
+                .title("お気に入り削除確認")
+                .message("お気に入りを削除すると関連付けたタグ情報も削除されます。nよろしいですか？")
+                .positive(android.R.string.ok)
+                .negative(android.R.string.cancel)
+                .cancelable(true)
+                .requestCode(AlertDialogRequestCode.DELETE_FAVORITE_THREAD_CONFIRM)
+                .params(params)
+                .show();
+    }
+
+    @Override
+    public void notifyItemChanged(int position) {
+        adapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void onAlertDialogSuccess(AlertDialogRequestCode requestCode, int resultCode, Bundle params) {
+        switch (requestCode) {
+            case DELETE_FAVORITE_THREAD_CONFIRM:
+                if (resultCode == DialogInterface.BUTTON_POSITIVE) {
+                    ThreadInfo threadInfo = (ThreadInfo) Objects.requireNonNull(Objects.requireNonNull(params).getSerializable(PARAM_THREAD_INFO));
+                    presenter.onDeleteFavoriteThread(threadInfo);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onAlertDialogCancel(AlertDialogRequestCode requestCode, Bundle params) {
+        // NOOP
     }
 }

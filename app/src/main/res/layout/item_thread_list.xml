@@ -179,12 +179,15 @@
 
             </LinearLayout>
 
-            <ImageButton
+            <ToggleButton
                 android:id="@+id/favorite"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:background="@drawable/selector_favorite_state" />
+                android:background="@drawable/selector_favorite_state"
+                android:checked="true"
+                android:textOff=""
+                android:textOn="" />
 
         </LinearLayout>
 

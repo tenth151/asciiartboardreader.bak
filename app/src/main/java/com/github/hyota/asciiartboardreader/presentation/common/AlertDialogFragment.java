@@ -12,6 +12,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
+import com.github.hyota.asciiartboardreader.domain.value.AlertDialogRequestCode;
+
 import java.util.Objects;
 
 public final class AlertDialogFragment extends DialogFragment {
@@ -28,7 +30,7 @@ public final class AlertDialogFragment extends DialogFragment {
          * @param resultCode  DialogInterface.BUTTON_(POSI|NEGA)TIVE 若しくはリストの position
          * @param params      AlertDialogFragmentFragment に受渡した引数
          */
-        void onAlertDialogSuccess(int requestCode, int resultCode, Bundle params);
+        void onAlertDialogSuccess(AlertDialogRequestCode requestCode, int resultCode, Bundle params);
 
         /**
          * AlertDialogFragment がキャンセルされた時に呼ばれる.
@@ -36,7 +38,7 @@ public final class AlertDialogFragment extends DialogFragment {
          * @param requestCode AlertDialogFragmentFragment 実行時 requestCode
          * @param params      AlertDialogFragmentFragment に受渡した引数
          */
-        void onAlertDialogCancel(int requestCode, Bundle params);
+        void onAlertDialogCancel(AlertDialogRequestCode requestCode, Bundle params);
     }
 
     /**
@@ -66,7 +68,7 @@ public final class AlertDialogFragment extends DialogFragment {
         String negativeLabel;
 
         /*** リクエストコード. 親 Fragment 側の戻りで受け取る.         */
-        int requestCode = -1;
+        AlertDialogRequestCode requestCode = AlertDialogRequestCode.NONE;
 
         /** リスナに受け渡す任意のパラメータ. */
         Bundle params;
@@ -198,7 +200,7 @@ public final class AlertDialogFragment extends DialogFragment {
          * @param requestCode リクエストコード
          * @return Builder
          */
-        public Builder requestCode(final int requestCode) {
+        public Builder requestCode(final AlertDialogRequestCode requestCode) {
             this.requestCode = requestCode;
             return this;
         }
@@ -250,13 +252,9 @@ public final class AlertDialogFragment extends DialogFragment {
             if (params != null) {
                 args.putBundle("params", params);
             }
+            args.putSerializable("request_code", requestCode);
 
             final AlertDialogFragment f = new AlertDialogFragment();
-            if (parentFragment != null) {
-                f.setTargetFragment(parentFragment, requestCode);
-            } else {
-                args.putInt("request_code", requestCode);
-            }
             f.setArguments(args);
             if (parentFragment != null) {
                 f.show(parentFragment.getChildFragmentManager(), tag);
@@ -343,7 +341,8 @@ public final class AlertDialogFragment extends DialogFragment {
      *
      * @return requestCode
      */
-    private int getRequestCode() {
-        return Objects.requireNonNull(getArguments()).containsKey("request_code") ? getArguments().getInt("request_code") : getTargetRequestCode();
+    @NonNull
+    private AlertDialogRequestCode getRequestCode() {
+        return (AlertDialogRequestCode) Objects.requireNonNull(Objects.requireNonNull(getArguments()).getSerializable("request_code"));
     }
 }

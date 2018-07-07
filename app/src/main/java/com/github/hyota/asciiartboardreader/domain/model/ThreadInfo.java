@@ -10,7 +10,9 @@ import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.temporal.ChronoUnit;
 
-public class ThreadInfo extends ThreadSubject {
+import java.io.Serializable;
+
+public class ThreadInfo extends ThreadSubject implements Serializable {
 
     @NonNull
     private BbsInfo bbsInfo;
@@ -37,6 +39,13 @@ public class ThreadInfo extends ThreadSubject {
         super(unixTime, title, count);
         this.bbsInfo = bbsInfo;
         this.no = no;
+        this.since = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixTime), ZoneId.systemDefault());
+        this.push = (double) count / ChronoUnit.MINUTES.between(since, ZonedDateTime.now()) * 60 * 24;
+    }
+
+    public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo) {
+        super(unixTime, title, count);
+        this.bbsInfo = bbsInfo;
         this.since = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixTime), ZoneId.systemDefault());
         this.push = (double) count / ChronoUnit.MINUTES.between(since, ZonedDateTime.now()) * 60 * 24;
     }
