@@ -18,7 +18,13 @@ public interface ShitarabaService {
 
     @Streaming
     @GET("/bbs/api/setting.cgi/{category}/{directory}/")
-    Single<Response<ResponseBody>> setting(@Path("category") String category,
-                                           @Path("directory") String directory);
+    Single<Response<ResponseBody>> setting(@NonNull @Path("category") String category,
+                                           @NonNull @Path("directory") String directory);
+
+    @Streaming
+    @GET("/bbs/rawmode.cgi/{category}/{directory}/{unixTime}/")
+    Single<Response<ResponseBody>> dat(@NonNull @Path("category") String category,
+                                       @NonNull @Path("directory") String directory,
+                                       @Path("unixTime") long unixTime);
 
 }

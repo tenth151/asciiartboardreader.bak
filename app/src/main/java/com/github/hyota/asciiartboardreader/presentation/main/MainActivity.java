@@ -1,5 +1,6 @@
 package com.github.hyota.asciiartboardreader.presentation.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -19,6 +20,7 @@ import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListFragment;
+import com.github.hyota.asciiartboardreader.presentation.thread.ThreadResponseListFragment;
 import com.github.hyota.asciiartboardreader.presentation.threadlist.ThreadListFragment;
 
 import javax.inject.Inject;
@@ -27,6 +29,7 @@ import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity
         implements MainContract.View, HasSupportFragmentInjector, NavigationView.OnNavigationItemSelectedListener,
@@ -36,6 +39,11 @@ public class MainActivity extends AppCompatActivity
     DispatchingAndroidInjector<Fragment> fragmentInjector;
     @Inject
     MainContract.Presenter presenter;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +161,21 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onThreadSelect(ThreadInfo threadInfo) {
-        // TODO スレ表示に遷移
+        FragmentManager manager = getSupportFragmentManager();
+        String tag = Stream.of(threadInfo.getBbsInfo().getHost(), threadInfo.getBbsInfo().getCategory(), threadInfo.getBbsInfo().getDirectory(), String.valueOf(threadInfo.getUnixTime()))
+                .filter(it -> it != null)
+                .collect(Collectors.joining("/"));
+        Fragment fragment = manager.findFragmentByTag(tag);
+        if (fragment != null) {
+            manager.beginTransaction()
+                    .replace(R.id.container, fragment, tag)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            manager.beginTransaction()
+                    .add(R.id.container, ThreadResponseListFragment.newInstance(threadInfo), tag)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 }

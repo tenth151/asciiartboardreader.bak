@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 
 public class ThreadListFragment extends Fragment
@@ -39,6 +40,7 @@ public class ThreadListFragment extends Fragment
     RecyclerView recyclerView;
 
     private Context context;
+    private Unbinder unbinder;
     private OnThreadSelectListener listener;
     private ThreadListRecyclerViewAdapter adapter;
 
@@ -77,7 +79,7 @@ public class ThreadListFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_thread_list, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
@@ -85,6 +87,11 @@ public class ThreadListFragment extends Fragment
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
     @Override
     public void onDetach() {
