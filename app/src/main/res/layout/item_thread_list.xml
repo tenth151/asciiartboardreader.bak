@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginEnd="5dp"
@@ -7,13 +8,28 @@
     android:background="?android:attr/selectableItemBackground"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/no"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
+        android:layout_marginStart="5dp"
         android:gravity="center"
-        android:text="1000" />
+        android:orientation="vertical"
+        tools:ignore="UseCompoundDrawables">
+
+        <TextView
+            android:id="@+id/no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1000" />
+
+        <ImageView
+            android:id="@+id/state"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -25,128 +41,150 @@
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:text="【R-18】無触蹌踉童帝 ◆CDXOg0zb8EのVault111　937スレ目" />
 
-        <TextView
-            android:id="@+id/bbs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="やる夫系雑談・避難・投下板（緊急避難用）" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="レス：" />
-
-            <TextView
-                android:id="@+id/count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1000" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="取得：" />
-
-            <TextView
-                android:id="@+id/readCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="800" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="新着：" />
-
-            <TextView
-                android:id="@+id/newCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="200" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="勢い：" />
-
-            <TextView
-                android:id="@+id/push"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="20.0" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="since：" />
-
-            <TextView
-                android:id="@+id/since"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1970/01/01 00:00:00" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/bbs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="最終取得：" />
+                    android:text="やる夫系雑談・避難・投下板（緊急避難用）" />
 
-                <TextView
-                    android:id="@+id/last_update"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="1970/01/01 00:00:00" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_count" />
+
+                    <TextView
+                        android:id="@+id/count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/label_read_count" />
+
+                    <TextView
+                        android:id="@+id/readCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="800" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/label_new_count" />
+
+                    <TextView
+                        android:id="@+id/newCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="200" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_push" />
+
+                    <TextView
+                        android:id="@+id/push"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="20.0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/label_since" />
+
+                    <TextView
+                        android:id="@+id/since"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1970/01/01 00:00:00" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_last_update" />
+
+                        <TextView
+                            android:id="@+id/last_update"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1970/01/01 00:00:00" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_last_write" />
+
+                        <TextView
+                            android:id="@+id/last_write"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1970/01/01 00:00:00" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="最終書込：" />
-
-                <TextView
-                    android:id="@+id/last_write"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1970/01/01 00:00:00" />
-
-            </LinearLayout>
+            <ImageButton
+                android:id="@+id/favorite"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:background="@drawable/selector_favorite_state" />
 
         </LinearLayout>
 

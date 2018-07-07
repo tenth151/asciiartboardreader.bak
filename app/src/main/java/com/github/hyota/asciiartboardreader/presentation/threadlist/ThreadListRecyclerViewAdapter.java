@@ -52,8 +52,8 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
         holder.title.setText(item.getTitle());
         holder.bbs.setText(item.getBbsInfo().getTitle());
         holder.count.setText(String.valueOf(item.getCount()));
-        holder.readCount.setText(String.valueOf(item.getReadCount()));
-        holder.newCount.setText(String.valueOf(item.getNewCount()));
+        holder.readCount.setText(item.getReadCount() != null ? item.getReadCount().toString() : "");
+        holder.newCount.setText(item.getNewCount() != null ? item.getNewCount().toString() : "");
         holder.push.setText(String.format(Locale.getDefault(), "%1$.1f", item.getPush()));
         holder.since.setText(item.getSince().format(THREAD_DATE_FORMATTER));
         holder.lastUpdate.setText(item.getLastUpdate() != null ? item.getLastUpdate().format(THREAD_DATE_FORMATTER) : "");
