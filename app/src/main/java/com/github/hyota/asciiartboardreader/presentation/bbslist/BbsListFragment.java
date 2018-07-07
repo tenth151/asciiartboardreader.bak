@@ -33,8 +33,10 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     @Inject
     BbsListContract.Presenter presenter;
     @BindView(R.id.list)
+    @Nullable
     RecyclerView recyclerView;
     @BindView(R.id.fab)
+    @Nullable
     FloatingActionButton addBbsButton;
 
     private Context context;
@@ -69,11 +71,14 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bbs_list, container, false);
         unbinder = ButterKnife.bind(this, view);
+        if (addBbsButton != null) {
+            addBbsButton.setOnClickListener(v -> presenter.onAddButtonClick());
+        }
 
-        addBbsButton.setOnClickListener(v -> presenter.onAddButtonClick());
-
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(itemDecoration);
+        if (recyclerView != null) {
+            RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(itemDecoration);
+        }
 
         presenter.load();
 
@@ -97,8 +102,10 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     @Override
     public void setData(@NonNull List<BbsInfo> bbsInfoList) {
         Timber.d("setData");
-        adapter = new BbsRecyclerViewAdapter(bbsInfoList, listener::onBbsSelect, presenter::onBbsLongClick);
-        recyclerView.setAdapter(adapter);
+        if (recyclerView != null) {
+            adapter = new BbsRecyclerViewAdapter(bbsInfoList, listener::onBbsSelect, presenter::onBbsLongClick);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override

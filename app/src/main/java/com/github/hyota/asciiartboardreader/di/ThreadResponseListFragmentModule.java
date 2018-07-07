@@ -1,9 +1,9 @@
 package com.github.hyota.asciiartboardreader.di;
 
 import com.github.hyota.asciiartboardreader.data.repository.DatRepository;
-import com.github.hyota.asciiartboardreader.presentation.thread.ThreadResponseListContract;
-import com.github.hyota.asciiartboardreader.presentation.thread.ThreadResponseListFragment;
-import com.github.hyota.asciiartboardreader.presentation.thread.ThreadResponseListPresenter;
+import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListContract;
+import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListFragment;
+import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListPresenter;
 
 import dagger.Module;
 import dagger.Provides;

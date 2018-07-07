@@ -1,4 +1,4 @@
-package com.github.hyota.asciiartboardreader.presentation.thread;
+package com.github.hyota.asciiartboardreader.presentation.threadresponselist;
 
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.ResponseInfo;
+import com.turingtechnologies.materialscrollbar.ICustomAdapter;
 
 import org.threeten.bp.format.DateTimeFormatter;
 
@@ -20,7 +21,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ResponseRecyclerViewAdapter extends RecyclerView.Adapter<ResponseRecyclerViewAdapter.ViewHolder> {
+public class ResponseRecyclerViewAdapter extends RecyclerView.Adapter<ResponseRecyclerViewAdapter.ViewHolder>
+        implements ICustomAdapter {
 
     private static final DateTimeFormatter RESPONSE_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd(E) HH:mm:ss");
 
@@ -68,6 +70,11 @@ public class ResponseRecyclerViewAdapter extends RecyclerView.Adapter<ResponseRe
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    @Override
+    public String getCustomStringForElement(int element) {
+        return String.valueOf(items.get(element).getNo());
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -7,16 +7,29 @@
     android:background="@android:color/white"
     tools:context=".presentation.main.MainActivity">
 
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list"
-        android:name="com.github.hyota.asciiartboardreader.presentation.bbslist.BoardListFragment"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        tools:context=".presentation.bbslist.BbsListFragment"
-        tools:listitem="@layout/item_bbs_list" />
+        android:layout_height="match_parent">
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:name="com.github.hyota.asciiartboardreader.presentation.bbslist.BoardListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            tools:context=".presentation.bbslist.BbsListFragment"
+            tools:listitem="@layout/item_bbs_list" />
+
+        <com.turingtechnologies.materialscrollbar.DragScrollBar
+            android:id="@+id/dragScrollBar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            app:msb_lightOnTouch="true"
+            app:msb_recyclerView="@id/list" />
+
+    </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

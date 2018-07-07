@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,8 @@ import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.value.AlertDialogRequestCode;
 import com.github.hyota.asciiartboardreader.presentation.common.AlertDialogFragment;
+import com.turingtechnologies.materialscrollbar.CustomIndicator;
+import com.turingtechnologies.materialscrollbar.DragScrollBar;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +40,10 @@ public class ThreadListFragment extends Fragment
     @Inject
     ThreadListContract.Presenter presenter;
     @BindView(R.id.list)
+    @Nullable
     RecyclerView recyclerView;
+    @BindView(R.id.dragScrollBar)
+    DragScrollBar scrollBar;
 
     private Context context;
     private Unbinder unbinder;
@@ -81,8 +87,13 @@ public class ThreadListFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_thread_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(itemDecoration);
+        if (recyclerView != null) {
+            RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(itemDecoration);
+        }
+        if (scrollBar != null) {
+            scrollBar.setIndicator(new CustomIndicator(context), true);
+        }
 
         return view;
     }
@@ -101,8 +112,10 @@ public class ThreadListFragment extends Fragment
 
     @Override
     public void setData(@NonNull List<ThreadInfo> threadInfoList) {
-        adapter = new ThreadListRecyclerViewAdapter(threadInfoList, threadInfo -> listener.onThreadSelect(threadInfo), (threadInfo, favorite) -> presenter.onFavoriteStateChange(threadInfo, favorite));
-        recyclerView.setAdapter(adapter);
+        if (recyclerView != null) {
+            adapter = new ThreadListRecyclerViewAdapter(threadInfoList, threadInfo -> listener.onThreadSelect(threadInfo), (threadInfo, favorite) -> presenter.onFavoriteStateChange(threadInfo, favorite));
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override

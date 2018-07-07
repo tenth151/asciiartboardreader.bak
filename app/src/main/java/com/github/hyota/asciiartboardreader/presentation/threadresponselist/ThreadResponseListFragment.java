@@ -1,8 +1,9 @@
-package com.github.hyota.asciiartboardreader.presentation.thread;
+package com.github.hyota.asciiartboardreader.presentation.threadresponselist;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.ResponseInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
+import com.turingtechnologies.materialscrollbar.CustomIndicator;
+import com.turingtechnologies.materialscrollbar.DragScrollBar;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +35,11 @@ public class ThreadResponseListFragment extends Fragment
     @Inject
     ThreadResponseListContract.Presenter presenter;
     @BindView(R.id.list)
+    @Nullable
     RecyclerView recyclerView;
+    @BindView(R.id.dragScrollBar)
+    @Nullable
+    DragScrollBar scrollBar;
 
     private Context context;
     private Unbinder unbinder;
@@ -65,8 +72,13 @@ public class ThreadResponseListFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_thread_response_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(itemDecoration);
+        if (recyclerView != null) {
+            RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(itemDecoration);
+        }
+        if (scrollBar != null) {
+            scrollBar.setIndicator(new CustomIndicator(context), true);
+        }
 
         return view;
     }
@@ -79,7 +91,9 @@ public class ThreadResponseListFragment extends Fragment
 
     @Override
     public void setData(@NonNull List<ResponseInfo> items) {
-        adapter = new ResponseRecyclerViewAdapter(items);
-        recyclerView.setAdapter(adapter);
+        if (recyclerView != null) {
+            adapter = new ResponseRecyclerViewAdapter(items);
+            recyclerView.setAdapter(adapter);
+        }
     }
 }

@@ -20,7 +20,7 @@ import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListFragment;
-import com.github.hyota.asciiartboardreader.presentation.thread.ThreadResponseListFragment;
+import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListFragment;
 import com.github.hyota.asciiartboardreader.presentation.threadlist.ThreadListFragment;
 
 import javax.inject.Inject;

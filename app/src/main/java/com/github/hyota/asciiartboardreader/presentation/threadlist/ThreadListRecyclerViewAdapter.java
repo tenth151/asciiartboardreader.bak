@@ -12,6 +12,7 @@ import android.widget.ToggleButton;
 
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
+import com.turingtechnologies.materialscrollbar.ICustomAdapter;
 
 import org.threeten.bp.format.DateTimeFormatter;
 
@@ -21,7 +22,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadListRecyclerViewAdapter.ViewHolder> {
+public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadListRecyclerViewAdapter.ViewHolder>
+        implements ICustomAdapter {
 
     private static final DateTimeFormatter THREAD_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm", Locale.getDefault());
 
@@ -103,6 +105,12 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    @Override
+    public String getCustomStringForElement(int element) {
+        Integer no = items.get(element).getNo();
+        return no != null ? no.toString() : "";
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

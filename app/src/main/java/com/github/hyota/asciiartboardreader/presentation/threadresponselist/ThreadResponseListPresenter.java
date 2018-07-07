@@ -1,4 +1,4 @@
-package com.github.hyota.asciiartboardreader.presentation.thread;
+package com.github.hyota.asciiartboardreader.presentation.threadresponselist;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
