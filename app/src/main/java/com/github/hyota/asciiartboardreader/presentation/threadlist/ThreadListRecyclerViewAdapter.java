@@ -83,7 +83,7 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
         holder.lastUpdate.setText(item.getLastUpdate() != null ? item.getLastUpdate().format(THREAD_DATE_FORMATTER) : "");
         holder.lastWrite.setText(item.getLastWrite() != null ? item.getLastWrite().format(THREAD_DATE_FORMATTER) : "");
         holder.favorite.setOnCheckedChangeListener(null);
-        holder.favorite.setChecked(item.isFavorite());
+        holder.favorite.setChecked(item.getFavoriteId() != null);
 
         holder.view.setOnClickListener(view -> {
             if (onThreadClickListener != null) {

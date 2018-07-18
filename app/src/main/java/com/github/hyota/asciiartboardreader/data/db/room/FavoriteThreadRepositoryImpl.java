@@ -32,7 +32,7 @@ public class FavoriteThreadRepositoryImpl implements FavoriteThreadRepository {
     @Override
     public Single<List<ThreadInfo>> findByBbs(@NonNull BbsInfo bbsInfo) {
         return Single.create(e -> e.onSuccess(Stream.of(dao.findByBbsId(bbsInfo.getId()))
-                .map(entity -> new ThreadInfo(entity.getUnixTime(), entity.getTitle(), entity.getCount(), bbsInfo))
+                .map(entity -> new ThreadInfo(entity.getId(), entity.getUnixTime(), entity.getTitle(), entity.getCount(), bbsInfo))
                 .collect(Collectors.toList())));
     }
 
@@ -42,7 +42,7 @@ public class FavoriteThreadRepositoryImpl implements FavoriteThreadRepository {
         return Maybe.create(e -> {
             FavoriteThreadEntity entity = dao.findByUnixTimeAndBbsId(threadInfo.getUnixTime(), threadInfo.getBbsInfo().getId());
             if (entity != null) {
-                ThreadInfo info = new ThreadInfo(entity.getUnixTime(), entity.getTitle(), entity.getCount(), threadInfo.getBbsInfo());
+                ThreadInfo info = new ThreadInfo(entity.getId(), entity.getUnixTime(), entity.getTitle(), entity.getCount(), threadInfo.getBbsInfo());
                 e.onSuccess(info);
             } else {
                 e.onComplete();
@@ -52,11 +52,12 @@ public class FavoriteThreadRepositoryImpl implements FavoriteThreadRepository {
 
     @NonNull
     @Override
-    public Completable save(@NonNull ThreadInfo threadInfo) {
-        return Completable.create(e -> {
+    public Single<ThreadInfo> save(@NonNull ThreadInfo threadInfo) {
+        return Single.create(e -> {
             FavoriteThreadEntity entity = new FavoriteThreadEntity(threadInfo.getUnixTime(), threadInfo.getBbsInfo().getId(), threadInfo.getTitle(), threadInfo.getCount());
-            dao.insert(entity);
-            e.onComplete();
+            long id = dao.insert(entity);
+            ThreadInfo favoriteThread = new ThreadInfo(id, threadInfo.getUnixTime(), threadInfo.getTitle(), threadInfo.getCount(), threadInfo.getBbsInfo());
+            e.onSuccess(favoriteThread);
         });
     }
 

@@ -6,14 +6,18 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.FavoriteThreadRepository;
+import com.github.hyota.asciiartboardreader.data.repository.ReadHistoryRepository;
 import com.github.hyota.asciiartboardreader.data.repository.SubjectRepository;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadSubject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -27,6 +31,8 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
     private SubjectRepository subjectRepository;
     @NonNull
     private FavoriteThreadRepository favoriteThreadRepository;
+    @NonNull
+    private ReadHistoryRepository readHistoryRepository;
 
     private List<ThreadInfo> items;
 
@@ -58,7 +64,7 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                                 for (ThreadInfo favoriteThread : favoriteThreadList) {
                                     ThreadInfo threadInfo = unixTimeMap.get(favoriteThread.getUnixTime());
                                     if (threadInfo != null) {
-                                        threadInfo.setFavorite(true);
+                                        threadInfo.setFavoriteId(favoriteThread.getFavoriteId());
                                     } else {
                                         ret.add(favoriteThread);
                                     }
@@ -66,6 +72,35 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                             });
                     return ret;
                 })
+                .map(threadInfoList -> { // 履歴マージ
+                    List<ThreadInfo> ret = new ArrayList<>(threadInfoList);
+                    Map<Long, ThreadInfo> unixTimeMap = Stream.of(threadInfoList).collect(Collectors.toMap(ThreadInfo::getUnixTime, threadInfo -> threadInfo));
+                    readHistoryRepository.findByBbs(bbsInfo)
+                            .subscribe(historyThreadList -> {
+                                for (ThreadInfo historyThread : historyThreadList) {
+                                    ThreadInfo threadInfo = unixTimeMap.get(historyThread.getUnixTime());
+                                    if (threadInfo != null) {
+                                        threadInfo.setHistoryId(Objects.requireNonNull(historyThread.getHistoryId()));
+                                        threadInfo.setReadCount(Objects.requireNonNull(historyThread.getReadCount()));
+                                        threadInfo.setLastUpdate(Objects.requireNonNull(historyThread.getLastUpdate()));
+                                    } else {
+                                        ret.add(historyThread);
+                                    }
+                                }
+                            });
+                    return ret;
+                })
+                .doOnSuccess(threadInfoList -> Collections.sort(threadInfoList, (t1, t2) -> {
+                    if (t1.getNo() != null && t2.getNo() != null) {
+                        return t1.getNo().compareTo(t2.getNo());
+                    } else if (t1.getNo() != null && t2.getNo() == null) {
+                        return 1;
+                    } else if (t1.getNo() == null && t2.getNo() != null) {
+                        return -1;
+                    } else {
+                        return t1.getSince().compareTo(t2.getSince());
+                    }
+                }))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(threadInfoList -> {
                     items = threadInfoList;
@@ -82,8 +117,8 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                 favoriteThreadRepository.save(favoriteThread)
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> {
-                            favoriteThread.setFavorite(true);
+                        .subscribe(info -> {
+                            favoriteThread.setFavoriteId(info.getFavoriteId());
                             view.notifyItemChanged(items.indexOf(favoriteThread));
                         });
             } else {
@@ -104,7 +139,7 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(() -> {
-                        favoriteThread.setFavorite(false);
+                        favoriteThread.setFavoriteId(null);
                         view.notifyItemChanged(items.indexOf(favoriteThread));
                     });
         } else {

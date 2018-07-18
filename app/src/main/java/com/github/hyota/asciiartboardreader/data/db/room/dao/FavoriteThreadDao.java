@@ -19,7 +19,7 @@ public interface FavoriteThreadDao {
     FavoriteThreadEntity findByUnixTimeAndBbsId(long unixTime, long bbsId);
 
     @Insert
-    void insert(FavoriteThreadEntity entity);
+    long insert(FavoriteThreadEntity entity);
 
     @Delete
     void delete(FavoriteThreadEntity entity);

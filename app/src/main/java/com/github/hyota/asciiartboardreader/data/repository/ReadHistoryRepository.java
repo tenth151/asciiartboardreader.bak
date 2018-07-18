@@ -11,7 +11,7 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
-public interface FavoriteThreadRepository {
+public interface ReadHistoryRepository {
 
     @NonNull
     Single<List<ThreadInfo>> findByBbs(@NonNull BbsInfo bbsInfo);

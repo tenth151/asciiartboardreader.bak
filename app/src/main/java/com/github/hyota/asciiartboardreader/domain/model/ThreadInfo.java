@@ -19,7 +19,8 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
     @NonNull
     private ThreadState state = ThreadState.NONE;
 
-    private boolean favorite = false;
+    @Nullable
+    private Long favoriteId = null;
     @Nullable
     private Integer no;
     @Nullable
@@ -34,6 +35,8 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
     private ZonedDateTime lastUpdate = null;
     @Nullable
     private ZonedDateTime lastWrite = null;
+    @Nullable
+    private Long historyId = null;
 
     public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, @NonNull Integer no) {
         super(unixTime, title, count);
@@ -43,14 +46,15 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
         this.push = (double) count / ChronoUnit.MINUTES.between(since, ZonedDateTime.now()) * 60 * 24;
     }
 
-    public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo) {
+    public ThreadInfo(long favoriteId, long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo) {
         super(unixTime, title, count);
         this.bbsInfo = bbsInfo;
         this.since = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixTime), ZoneId.systemDefault());
-        this.push = (double) count / ChronoUnit.MINUTES.between(since, ZonedDateTime.now()) * 60 * 24;
+        this.push = 0.0;
+        this.favoriteId = favoriteId;
     }
 
-    public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, @NonNull Long readCount, @NonNull ZonedDateTime lastUpdate, @Nullable ZonedDateTime lastWrite) {
+    public ThreadInfo(long historyId, long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, @NonNull Long readCount, @NonNull ZonedDateTime lastUpdate, @Nullable ZonedDateTime lastWrite) {
         super(unixTime, title, count);
         this.bbsInfo = bbsInfo;
         this.no = null;
@@ -61,6 +65,7 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
         this.push = 0.0;
         this.lastUpdate = lastUpdate;
         this.lastWrite = lastWrite;
+        this.historyId = historyId;
     }
 
     @NonNull
@@ -73,12 +78,13 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
         return state;
     }
 
-    public boolean isFavorite() {
-        return favorite;
+    @Nullable
+    public Long getFavoriteId() {
+        return favoriteId;
     }
 
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
+    public void setFavoriteId(@Nullable Long favoriteId) {
+        this.favoriteId = favoriteId;
     }
 
     @Nullable
@@ -131,6 +137,15 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
 
     public void setLastWrite(@Nullable ZonedDateTime lastWrite) {
         this.lastWrite = lastWrite;
+    }
+
+    @Nullable
+    public Long getHistoryId() {
+        return historyId;
+    }
+
+    public void setHistoryId(@NonNull Long historyId) {
+        this.historyId = historyId;
     }
 
 }
