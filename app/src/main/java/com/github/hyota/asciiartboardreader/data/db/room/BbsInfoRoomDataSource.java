@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.github.hyota.asciiartboardreader.data.datasource.BbsInfoDataSource;
 import com.github.hyota.asciiartboardreader.data.db.room.dao.BbsInfoDao;
 import com.github.hyota.asciiartboardreader.data.db.room.entity.BbsInfoEntity;
 import com.github.hyota.asciiartboardreader.data.repository.BbsInfoRepository;
@@ -18,13 +19,13 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
-public class BbsInfoRepositoryImpl implements BbsInfoRepository {
+public class BbsInfoRoomDataSource implements BbsInfoDataSource {
 
     @NonNull
     private BbsInfoDao dao;
 
     @Inject
-    BbsInfoRepositoryImpl(@NonNull BbsInfoDao dao) {
+    BbsInfoRoomDataSource(@NonNull BbsInfoDao dao) {
         this.dao = dao;
     }
 

@@ -3,9 +3,12 @@ package com.github.hyota.asciiartboardreader.data.repository;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.github.hyota.asciiartboardreader.data.datasource.BbsInfoDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -14,21 +17,39 @@ import io.reactivex.Single;
 /**
  * 板情報リポジトリ
  */
-public interface BbsInfoRepository {
+public class BbsInfoRepository {
 
     @NonNull
-    Single<List<BbsInfo>> findAll();
+    private BbsInfoDataSource dataSource;
+
+    @Inject
+    BbsInfoRepository(@NonNull BbsInfoDataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @NonNull
-    Maybe<BbsInfo> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory);
+    public Single<List<BbsInfo>> findAll() {
+        return dataSource.findAll();
+    }
 
     @NonNull
-    Maybe<BbsInfo> findByTitle(@NonNull String title);
+    public Maybe<BbsInfo> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
+        return dataSource.findByUrl(scheme, host, category, directory);
+    }
 
     @NonNull
-    Single<BbsInfo> save(@NonNull BbsInfo bbsInfo);
+    public Maybe<BbsInfo> findByTitle(@NonNull String title) {
+        return dataSource.findByTitle(title);
+    }
 
     @NonNull
-    Completable delete(long id);
+    public Single<BbsInfo> save(@NonNull BbsInfo bbsInfo) {
+        return dataSource.save(bbsInfo);
+    }
+
+    @NonNull
+    public Completable delete(long id) {
+        return dataSource.delete(id);
+    }
 
 }
