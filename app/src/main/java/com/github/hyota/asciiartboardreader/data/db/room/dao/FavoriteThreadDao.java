@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.github.hyota.asciiartboardreader.data.db.room.entity.FavoriteThreadEntity;
 
@@ -19,10 +20,13 @@ public interface FavoriteThreadDao {
     FavoriteThreadEntity findByUnixTimeAndBbsId(long unixTime, long bbsId);
 
     @Insert
-    long insert(FavoriteThreadEntity entity);
+    void insert(FavoriteThreadEntity entity);
 
     @Delete
     void delete(FavoriteThreadEntity entity);
+
+    @Query("DELETE FROM favorite_thread_info WHERE bbsId = :bbsId")
+    void deleteByBbsId(long bbsId);
 
     @Query("DELETE FROM favorite_thread_info WHERE unixTime = :unixTime AND bbsId = :bbsId")
     void deleteByUnixTimeAndBbsId(long unixTime, long bbsId);

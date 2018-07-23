@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.FavoriteThreadRepository;
-import com.github.hyota.asciiartboardreader.data.repository.ReadHistoryRepository;
+import com.github.hyota.asciiartboardreader.data.repository.HistoryRepository;
 import com.github.hyota.asciiartboardreader.data.repository.SubjectRepository;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
@@ -14,7 +14,6 @@ import com.github.hyota.asciiartboardreader.domain.model.ThreadSubject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
     @NonNull
     private FavoriteThreadRepository favoriteThreadRepository;
     @NonNull
-    private ReadHistoryRepository readHistoryRepository;
+    private HistoryRepository historyRepository;
 
     private List<ThreadInfo> items;
 
@@ -46,13 +45,13 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
     @Override
     public void onCreate(@NonNull BbsInfo bbsInfo) {
         // TODO 履歴情報、お気に入り情報とのマージ予定
-        subjectRepository.findByUrl(bbsInfo.getScheme(), bbsInfo.getHost(), bbsInfo.getCategory(), bbsInfo.getDirectory())
+        subjectRepository.load(bbsInfo)
                 .subscribeOn(Schedulers.newThread())
-                .map(subject -> {
+                .map(threadSubjectList -> {
                     int index = 1;
                     List<ThreadInfo> threadInfoList = new ArrayList<>();
-                    for (ThreadSubject threadSubject : subject.getThreadSubjectList()) {
-                        threadInfoList.add(new ThreadInfo(threadSubject.getUnixTime(), threadSubject.getTitle(), threadSubject.getCount(), bbsInfo, index++));
+                    for (ThreadSubject threadSubject : threadSubjectList) {
+                        threadInfoList.add(new ThreadInfo(threadSubject, bbsInfo, index++));
                     }
                     return threadInfoList;
                 })
@@ -64,7 +63,7 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                                 for (ThreadInfo favoriteThread : favoriteThreadList) {
                                     ThreadInfo threadInfo = unixTimeMap.get(favoriteThread.getUnixTime());
                                     if (threadInfo != null) {
-                                        threadInfo.setFavoriteId(favoriteThread.getFavoriteId());
+                                        threadInfo.setFavorite(true);
                                     } else {
                                         ret.add(favoriteThread);
                                     }
@@ -75,14 +74,14 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                 .map(threadInfoList -> { // 履歴マージ
                     List<ThreadInfo> ret = new ArrayList<>(threadInfoList);
                     Map<Long, ThreadInfo> unixTimeMap = Stream.of(threadInfoList).collect(Collectors.toMap(ThreadInfo::getUnixTime, threadInfo -> threadInfo));
-                    readHistoryRepository.findByBbs(bbsInfo)
+                    historyRepository.findByBbs(bbsInfo)
                             .subscribe(historyThreadList -> {
                                 for (ThreadInfo historyThread : historyThreadList) {
                                     ThreadInfo threadInfo = unixTimeMap.get(historyThread.getUnixTime());
                                     if (threadInfo != null) {
-                                        threadInfo.setHistoryId(Objects.requireNonNull(historyThread.getHistoryId()));
-                                        threadInfo.setReadCount(Objects.requireNonNull(historyThread.getReadCount()));
                                         threadInfo.setLastUpdate(Objects.requireNonNull(historyThread.getLastUpdate()));
+                                        threadInfo.setReadCount(Objects.requireNonNull(historyThread.getReadCount()));
+                                        threadInfo.setLastWrite(historyThread.getLastWrite());
                                     } else {
                                         ret.add(historyThread);
                                     }
@@ -118,8 +117,9 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(info -> {
-                            favoriteThread.setFavoriteId(info.getFavoriteId());
-                            view.notifyItemChanged(items.indexOf(favoriteThread));
+                            int index = items.indexOf(favoriteThread);
+                            items.set(index, info);
+                            view.notifyItemChanged(index);
                         });
             } else {
                 Timber.w("favorite target %s is not found", threadInfo.getTitle());
@@ -139,7 +139,7 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(() -> {
-                        favoriteThread.setFavoriteId(null);
+                        favoriteThread.setFavorite(false);
                         view.notifyItemChanged(items.indexOf(favoriteThread));
                     });
         } else {

@@ -1,9 +1,10 @@
 package com.github.hyota.asciiartboardreader.data.repository;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.github.hyota.asciiartboardreader.domain.model.Subject;
+import com.github.hyota.asciiartboardreader.data.datasource.SubjectLocalDataSource;
+import com.github.hyota.asciiartboardreader.data.datasource.SubjectRemoteDataSource;
+import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadSubject;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
@@ -19,19 +20,41 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Maybe;
+import javax.inject.Inject;
+
 import io.reactivex.Single;
-import okio.Source;
 
-public interface SubjectRepository {
+public class SubjectRepository {
 
-    Pattern SHITARABA_PATTERN = Pattern.compile("(\\d+).cgi,(.+)\\((\\d+)\\)");
+    private static final Pattern SHITARABA_PATTERN = Pattern.compile("(\\d+).cgi,(.+)\\((\\d+)\\)");
 
-    Maybe<Subject> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory);
+    @NonNull
+    private SubjectLocalDataSource localDataSource;
+    @NonNull
+    private SubjectRemoteDataSource remoteDataSource;
 
-    Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, @NonNull Source source);
+    @Inject
+    public SubjectRepository(@NonNull SubjectLocalDataSource localDataSource, @NonNull SubjectRemoteDataSource remoteDataSource) {
+        this.localDataSource = localDataSource;
+        this.remoteDataSource = remoteDataSource;
+    }
 
-    default Subject parse(@NonNull File file, @NonNull String host) throws IOException {
+    @NonNull
+    public Single<List<ThreadSubject>> load(@NonNull BbsInfo bbsInfo) {
+        return localDataSource.load(bbsInfo)
+                .onErrorResumeNext(remoteDataSource.load(bbsInfo)
+                        .flatMap(sink -> localDataSource.save(bbsInfo, sink)))
+                .map(file -> parse(file, bbsInfo.getHost()));
+    }
+
+    @NonNull
+    public Single<List<ThreadSubject>> loadFromRemote(@NonNull BbsInfo bbsInfo) {
+        return remoteDataSource.load(bbsInfo)
+                .flatMap(sink -> localDataSource.save(bbsInfo, sink))
+                .map(file -> parse(file, bbsInfo.getHost()));
+    }
+
+    private List<ThreadSubject> parse(@NonNull File file, @NonNull String host) throws IOException {
         if (ShitarabaConstant.HOST.equals(host)) {
             try (FileInputStream fis = new FileInputStream(file);
                  InputStreamReader isr = new InputStreamReader(fis, ShitarabaConstant.ENCODE);
@@ -49,10 +72,11 @@ public interface SubjectRepository {
                         }
                     }
                 }
-                return new Subject(threadSubjectList);
+                return threadSubjectList;
             }
         } else {
             throw new IllegalStateException("not implements");
         }
     }
+
 }

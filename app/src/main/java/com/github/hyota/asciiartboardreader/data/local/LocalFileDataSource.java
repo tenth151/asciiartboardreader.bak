@@ -7,7 +7,7 @@ import com.github.hyota.asciiartboardreader.BuildConfig;
 
 import java.io.File;
 
-public interface LocalRepository {
+public interface LocalFileDataSource {
 
     default File getLocalDirectory(@NonNull String appName) {
         return new File(Environment.getExternalStorageDirectory(), appName);

@@ -7,26 +7,24 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-@Entity(tableName = "read_history",
-        indices = {
-                @Index(value = {
-                        "unixTime",
-                        "bbsId",
-                }, unique = true),
-                @Index(value = {
-                        "bbsId",
-                }),
+@Entity(tableName = "history",
+        primaryKeys = {
+                "unixTime",
+                "bbsId",
         },
         foreignKeys = {
                 @ForeignKey(entity = BbsInfoEntity.class,
                         parentColumns = "id",
                         childColumns = "bbsId",
                         onDelete = ForeignKey.CASCADE),
-        })
-public class ReadHistoryEntity {
-
-    @PrimaryKey(autoGenerate = true)
-    private long id;
+        },
+        indices = {
+                @Index(value = {
+                        "bbsId",
+                }, unique = true),
+        }
+)
+public class HistoryEntity {
 
     private long unixTime;
 
@@ -42,7 +40,7 @@ public class ReadHistoryEntity {
     @Nullable
     private Long lastWrite;
 
-    public ReadHistoryEntity(long unixTime, long bbsId, @NonNull String title, long count, long readCount, long lastUpdate, @Nullable Long lastWrite) {
+    public HistoryEntity(long unixTime, long bbsId, @NonNull String title, long count, long readCount, long lastUpdate, @Nullable Long lastWrite) {
         this.unixTime = unixTime;
         this.bbsId = bbsId;
         this.title = title;
@@ -50,14 +48,6 @@ public class ReadHistoryEntity {
         this.readCount = readCount;
         this.lastUpdate = lastUpdate;
         this.lastWrite = lastWrite;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public long getUnixTime() {

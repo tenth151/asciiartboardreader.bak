@@ -8,7 +8,7 @@ import com.github.hyota.asciiartboardreader.BuildConfig;
 import com.github.hyota.asciiartboardreader.data.db.room.AppDataBase;
 import com.github.hyota.asciiartboardreader.data.db.room.dao.BbsInfoDao;
 import com.github.hyota.asciiartboardreader.data.db.room.dao.FavoriteThreadDao;
-import com.github.hyota.asciiartboardreader.data.db.room.dao.ReadHistoryDao;
+import com.github.hyota.asciiartboardreader.data.db.room.dao.HistoryDao;
 
 import javax.inject.Singleton;
 
@@ -16,7 +16,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class DataBaseModule {
+public class RoomModule {
 
     @Provides
     @Singleton
@@ -42,7 +42,7 @@ public class DataBaseModule {
 
     @Provides
     @Singleton
-    ReadHistoryDao provideReadHistoryDao(AppDataBase dataBase) {
+    HistoryDao provideReadHistoryDao(AppDataBase dataBase) {
         return dataBase.readHistoryDao();
     }
 

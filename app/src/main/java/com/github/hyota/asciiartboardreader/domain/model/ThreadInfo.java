@@ -12,15 +12,13 @@ import org.threeten.bp.temporal.ChronoUnit;
 
 import java.io.Serializable;
 
-public class ThreadInfo extends ThreadSubject implements Serializable {
+public class ThreadInfo extends ThreadSubject implements Serializable, Cloneable {
 
     @NonNull
     private BbsInfo bbsInfo;
     @NonNull
     private ThreadState state = ThreadState.NONE;
 
-    @Nullable
-    private Long favoriteId = null;
     @Nullable
     private Integer no;
     @Nullable
@@ -35,8 +33,8 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
     private ZonedDateTime lastUpdate = null;
     @Nullable
     private ZonedDateTime lastWrite = null;
-    @Nullable
-    private Long historyId = null;
+
+    private boolean favorite = false;
 
     public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, @NonNull Integer no) {
         super(unixTime, title, count);
@@ -46,15 +44,36 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
         this.push = (double) count / ChronoUnit.MINUTES.between(since, ZonedDateTime.now()) * 60 * 24;
     }
 
-    public ThreadInfo(long favoriteId, long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo) {
+    public ThreadInfo(@NonNull ThreadSubject threadSubject, @NonNull BbsInfo bbsInfo, @NonNull Integer no) {
+        super(threadSubject);
+        this.bbsInfo = bbsInfo;
+        this.no = no;
+        this.since = ZonedDateTime.ofInstant(Instant.ofEpochSecond(threadSubject.getUnixTime()), ZoneId.systemDefault());
+        this.push = (double) threadSubject.getCount() / ChronoUnit.MINUTES.between(since, ZonedDateTime.now()) * 60 * 24;
+    }
+
+    public ThreadInfo(@NonNull ThreadInfo other) {
+        super(other);
+        this.bbsInfo = other.bbsInfo;
+        this.state = other.state;
+        this.no = other.no;
+        this.readCount = other.readCount;
+        this.newCount = other.newCount;
+        this.since = other.since;
+        this.push = other.push;
+        this.lastUpdate = other.lastUpdate;
+        this.lastWrite = other.lastWrite;
+    }
+
+    public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, boolean favorite) {
         super(unixTime, title, count);
         this.bbsInfo = bbsInfo;
         this.since = ZonedDateTime.ofInstant(Instant.ofEpochSecond(unixTime), ZoneId.systemDefault());
         this.push = 0.0;
-        this.favoriteId = favoriteId;
+        this.favorite = favorite;
     }
 
-    public ThreadInfo(long historyId, long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, @NonNull Long readCount, @NonNull ZonedDateTime lastUpdate, @Nullable ZonedDateTime lastWrite) {
+    public ThreadInfo(long unixTime, @NonNull String title, long count, @NonNull BbsInfo bbsInfo, @NonNull Long readCount, @NonNull ZonedDateTime lastUpdate, @Nullable ZonedDateTime lastWrite) {
         super(unixTime, title, count);
         this.bbsInfo = bbsInfo;
         this.no = null;
@@ -65,7 +84,6 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
         this.push = 0.0;
         this.lastUpdate = lastUpdate;
         this.lastWrite = lastWrite;
-        this.historyId = historyId;
     }
 
     @NonNull
@@ -76,15 +94,6 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
     @NonNull
     public ThreadState getState() {
         return state;
-    }
-
-    @Nullable
-    public Long getFavoriteId() {
-        return favoriteId;
-    }
-
-    public void setFavoriteId(@Nullable Long favoriteId) {
-        this.favoriteId = favoriteId;
     }
 
     @Nullable
@@ -139,13 +148,11 @@ public class ThreadInfo extends ThreadSubject implements Serializable {
         this.lastWrite = lastWrite;
     }
 
-    @Nullable
-    public Long getHistoryId() {
-        return historyId;
+    public boolean isFavorite() {
+        return favorite;
     }
 
-    public void setHistoryId(@NonNull Long historyId) {
-        this.historyId = historyId;
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
-
 }

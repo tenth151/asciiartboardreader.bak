@@ -15,6 +15,12 @@ public class ThreadSubject {
         this.count = count;
     }
 
+    public ThreadSubject(@NonNull ThreadSubject other) {
+        this.unixTime = other.unixTime;
+        this.title = other.title;
+        this.count = other.count;
+    }
+
     public long getUnixTime() {
         return unixTime;
     }

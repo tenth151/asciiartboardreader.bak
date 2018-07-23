@@ -2,9 +2,11 @@ package com.github.hyota.asciiartboardreader.data.repository;
 
 import android.support.annotation.NonNull;
 
-import com.github.hyota.asciiartboardreader.data.datasource.FavoriteThreadDataSource;
+import com.github.hyota.asciiartboardreader.data.datasource.HistoryDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
+
+import org.threeten.bp.ZonedDateTime;
 
 import java.util.List;
 
@@ -14,13 +16,13 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
-public class FavoriteThreadRepository {
+public class HistoryRepository {
 
     @NonNull
-    private FavoriteThreadDataSource dataSource;
+    private HistoryDataSource dataSource;
 
     @Inject
-    FavoriteThreadRepository(@NonNull FavoriteThreadDataSource dataSource) {
+    HistoryRepository(@NonNull HistoryDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -35,8 +37,18 @@ public class FavoriteThreadRepository {
     }
 
     @NonNull
-    public Single<ThreadInfo> save(@NonNull ThreadInfo threadInfo) {
-        return dataSource.save(threadInfo);
+    public Single<ThreadInfo> saveLastUpdate(@NonNull ThreadInfo threadInfo, @NonNull ZonedDateTime dateTime) {
+        return dataSource.saveLastUpdate(threadInfo, dateTime);
+    }
+
+    @NonNull
+    public Single<ThreadInfo> updateReadCount(@NonNull ThreadInfo threadInfo, long readCount) {
+        return dataSource.updateReadCount(threadInfo, readCount);
+    }
+
+    @NonNull
+    public Single<ThreadInfo> updateLastWrite(@NonNull ThreadInfo threadInfo, @NonNull ZonedDateTime dateTime) {
+        return dataSource.updateLastWrite(threadInfo, dateTime);
     }
 
     @NonNull

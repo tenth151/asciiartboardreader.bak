@@ -1,4 +1,4 @@
-package com.github.hyota.asciiartboardreader.data.repository;
+package com.github.hyota.asciiartboardreader.data.datasource;
 
 import android.support.annotation.NonNull;
 
@@ -11,13 +11,13 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
-public interface ReadHistoryRepository {
+public interface FavoriteThreadDataSource {
 
     @NonNull
     Single<List<ThreadInfo>> findByBbs(@NonNull BbsInfo bbsInfo);
 
     @NonNull
-    Maybe<ThreadInfo> findByThread(@NonNull ThreadInfo threadInfo);
+    Maybe<ThreadInfo> find(@NonNull ThreadInfo threadInfo);
 
     @NonNull
     Single<ThreadInfo> save(@NonNull ThreadInfo threadInfo);

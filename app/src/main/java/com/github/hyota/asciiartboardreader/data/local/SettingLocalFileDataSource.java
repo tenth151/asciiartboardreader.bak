@@ -22,13 +22,13 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-public class SettingLocalRepository implements SettingRepository, LocalRepository {
+public class SettingLocalFileDataSource implements SettingRepository, LocalFileDataSource {
 
     @NonNull
     private Context context;
 
     @Inject
-    SettingLocalRepository(@NonNull Context context) {
+    SettingLocalFileDataSource(@NonNull Context context) {
         this.context = context;
     }
 
