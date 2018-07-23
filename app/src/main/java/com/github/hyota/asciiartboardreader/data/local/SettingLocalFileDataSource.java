@@ -7,22 +7,21 @@ import android.support.annotation.Nullable;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.R;
-import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
-import com.github.hyota.asciiartboardreader.domain.model.Setting;
+import com.github.hyota.asciiartboardreader.data.datasource.SettingLocalDataSource;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 
 import javax.inject.Inject;
 
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-public class SettingLocalFileDataSource implements SettingRepository, LocalFileDataSource {
+public class SettingLocalFileDataSource implements SettingLocalDataSource, LocalFileDataSource {
 
     @NonNull
     private Context context;
@@ -32,20 +31,20 @@ public class SettingLocalFileDataSource implements SettingRepository, LocalFileD
         this.context = context;
     }
 
-    @Override
-    public Maybe<Setting> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
-        return Maybe.create(e -> {
+    @NonNull
+    public Single<File> load(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
+        return Single.create(e -> {
             File file = getFile(context.getString(R.string.app_name), host, category, directory);
             if (file.exists()) {
-                e.onSuccess(parse(file, host));
+                e.onSuccess(file);
             } else {
-                e.onComplete();
+                e.onError(new FileNotFoundException());
             }
         });
     }
 
-    @Override
-    public Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, @NonNull Source source) {
+    @NonNull
+    public Single<File> save(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, @NonNull Source source) {
         return Single.create(e -> {
             File dst = getFile(context.getString(R.string.app_name), host, category, directory);
             if (!dst.getParentFile().exists() && !dst.getParentFile().mkdirs()) {
@@ -53,7 +52,6 @@ public class SettingLocalFileDataSource implements SettingRepository, LocalFileD
             }
             try (BufferedSink sink = Okio.buffer(Okio.sink(dst))) {
                 sink.writeAll(source);
-                sink.flush();
                 e.onSuccess(dst);
             }
         });

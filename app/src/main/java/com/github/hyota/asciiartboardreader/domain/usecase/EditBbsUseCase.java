@@ -75,12 +75,11 @@ public class EditBbsUseCase {
                 if (elements.size() == 2) {
                     String category = elements.get(0);
                     String directory = elements.get(1);
-                    settingRepository.findByUrl(scheme, host, category, directory)
+                    settingRepository.load(scheme, host, category, directory)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(setting -> validDuplicatedUrl(id, sort, title, scheme, host, category, directory, onSuccessCallback, onErrorCallback),
-                                    throwable -> onErrorCallback.onError(throwable.getMessage()),
-                                    () -> onErrorCallback.onError("不正なURLです"));
+                                    throwable -> onErrorCallback.onError(throwable.getMessage()));
                 } else {
                     onErrorCallback.onError("不正なURLです");
                 }

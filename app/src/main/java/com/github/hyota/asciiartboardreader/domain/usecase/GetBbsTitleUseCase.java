@@ -70,15 +70,14 @@ public class GetBbsTitleUseCase {
                 if (elements.size() == 2) {
                     String category = elements.get(0);
                     String directory = elements.get(1);
-                    settingRepository.findByUrl(scheme, host, category, directory)
+                    settingRepository.load(scheme, host, category, directory)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(setting -> onSuccessCallback.onSuccess(setting.getTitle()),
                                     throwable -> {
                                         Timber.d(throwable);
                                         onErrorCallback.onError(throwable.getMessage());
-                                    },
-                                    () -> onErrorCallback.onError("不正なURLです"));
+                                    });
                 } else {
                     onErrorCallback.onError("不正なURLです");
                 }

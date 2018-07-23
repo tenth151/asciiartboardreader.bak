@@ -3,6 +3,8 @@ package com.github.hyota.asciiartboardreader.data.repository;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.github.hyota.asciiartboardreader.data.datasource.SettingLocalDataSource;
+import com.github.hyota.asciiartboardreader.data.datasource.SettingRemoteDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.Setting;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
@@ -13,18 +15,39 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-import io.reactivex.Maybe;
+import javax.inject.Inject;
+
 import io.reactivex.Single;
-import okio.Source;
 
-public interface SettingRepository {
-
-    Maybe<Setting> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory);
-
-    Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, @NonNull Source source);
+public class SettingRepository {
 
     @NonNull
-    default Setting parse(@NonNull File file, @NonNull String host) throws IOException {
+    private SettingLocalDataSource localDataSource;
+    @NonNull
+    private SettingRemoteDataSource remoteDataSource;
+
+    @Inject
+    public SettingRepository(@NonNull SettingLocalDataSource localDataSource, @NonNull SettingRemoteDataSource remoteDataSource) {
+        this.localDataSource = localDataSource;
+        this.remoteDataSource = remoteDataSource;
+    }
+
+    @NonNull
+    public Single<Setting> load(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
+        return localDataSource.load(scheme, host, category, directory)
+                .onErrorResumeNext(remoteDataSource.load(scheme, host, category, directory)
+                        .flatMap(sink -> localDataSource.save(scheme, host, category, directory, sink)))
+                .map(file -> parse(file, host));
+    }
+
+    @NonNull
+    public Single<Setting> loadFromRemote(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
+        return remoteDataSource.load(scheme, host, category, directory)
+                .flatMap(sink -> localDataSource.save(scheme, host, category, directory, sink))
+                .map(file -> parse(file, host));
+    }
+
+    private Setting parse(@NonNull File file, @NonNull String host) throws IOException {
         Charset charset;
         if (ShitarabaConstant.HOST.equals(host)) {
             charset = ShitarabaConstant.ENCODE;
@@ -48,4 +71,5 @@ public interface SettingRepository {
             return setting;
         }
     }
+
 }
