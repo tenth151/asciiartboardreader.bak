@@ -1,24 +1,23 @@
 package com.github.hyota.asciiartboardreader.presentation.bbslist;
 
-import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.github.hyota.asciiartboardreader.BuildConfig;
-import com.github.hyota.asciiartboardreader.data.repository.BbsInfoRepository;
 import com.github.hyota.asciiartboardreader.di.FragmentScope;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
+import com.github.hyota.asciiartboardreader.domain.usecase.LoadBbsListUseCase;
 
-import java.util.ArrayList;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @FragmentScope
@@ -27,39 +26,26 @@ public class BbsListPresenter implements BbsListContract.Presenter {
     @NonNull
     private BbsListContract.View view;
     @NonNull
-    private BbsInfoRepository bbsInfoRepository;
+    private LoadBbsListUseCase loadBbsListUseCase;
 
     private List<BbsInfo> items;
 
     @Inject
-    BbsListPresenter(@NonNull BbsListContract.View view, @NonNull BbsInfoRepository bbsInfoRepository) {
+    BbsListPresenter(@NonNull BbsListContract.View view, @NonNull LoadBbsListUseCase loadBbsListUseCase) {
         this.view = view;
-        this.bbsInfoRepository = bbsInfoRepository;
+        this.loadBbsListUseCase = loadBbsListUseCase;
     }
 
-    @SuppressLint("CheckResult")
     @Override
-    public void load() {
+    public void onStart() {
+        EventBus.getDefault().register(this);
         view.setData(Collections.emptyList());
+        loadBbsListUseCase.execute();
+    }
 
-        if (BuildConfig.DEBUG) {
-            bbsInfoRepository.findAll()
-                    .subscribe(bbsInfoList -> {
-                        if (bbsInfoList.isEmpty()) {
-                            bbsInfoRepository.save(new BbsInfo("やる夫スレヒロイン板（新）", "http", "jbbs.shitaraba.net", "otaku", "15956"))
-                                    .subscribe();
-                            bbsInfoRepository.save(new BbsInfo("やる夫系雑談・避難・投下板（緊急避難用）", "http", "jbbs.shitaraba.net", "internet", "3408"))
-                                    .subscribe();
-                        }
-                    });
-        }
-        bbsInfoRepository.findAll()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bbsInfoList -> {
-                    items = new ArrayList<>(bbsInfoList);
-                    view.setData(items);
-                });
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -105,6 +91,11 @@ public class BbsListPresenter implements BbsListContract.Presenter {
         } else {
             Timber.w("not found id = %s", position);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLoadBbsListEvent(@NonNull LoadBbsListUseCase.Event event) {
+        view.setData(event.getItems());
     }
 
 }

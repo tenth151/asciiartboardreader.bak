@@ -2,12 +2,14 @@ package com.github.hyota.asciiartboardreader.domain.usecase;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
+import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,23 +26,15 @@ public class GetBbsTitleUseCase {
     @NonNull
     private SettingRepository settingRepository;
 
-    public interface OnSuccessCallback {
-        void onSuccess(@Nullable String title);
-    }
-
-    public interface OnErrorCallback {
-        void onError(@NonNull String message);
-    }
-
     @Inject
     GetBbsTitleUseCase(@NonNull SettingRepository settingRepository) {
         this.settingRepository = settingRepository;
     }
 
     @SuppressLint("CheckResult")
-    public void execute(@NonNull String url, @NonNull OnSuccessCallback onSuccessCallback, @NonNull OnErrorCallback onErrorCallback) {
+    public void execute(@NonNull String url) {
         if (TextUtils.isEmpty(url)) {
-            onErrorCallback.onError("URLの入力がありません");
+            EventBus.getDefault().post(new ErrorEvent("URLの入力がありません"));
             return;
         }
         try {
@@ -49,51 +43,86 @@ public class GetBbsTitleUseCase {
             String scheme = uri.getScheme();
             if (!"http".equals(scheme) && !"https".equals(scheme)) {
                 Timber.d("scheme is invalidate. %s", scheme);
-                onErrorCallback.onError("不正なURLです");
+                EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 return;
             }
             String host = uri.getHost();
             if (host == null) {
                 Timber.d("host is null");
-                onErrorCallback.onError("不正なURLです");
+                EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 return;
             }
             String path = uri.getPath();
             if (path == null) {
                 Timber.d("path is null");
-                onErrorCallback.onError("不正なURLです");
+                EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 return;
             }
             Timber.d("path = %s", path);
             List<String> elements = Stream.of(path.split("/")).filter(it -> !TextUtils.isEmpty(it)).collect(Collectors.toList());
-            if ("jbbs.shitaraba.net".equals(host)) { // したらばの場合
+            if (ShitarabaConstant.HOST.equals(host)) { // したらばの場合
                 if (elements.size() == 2) {
                     String category = elements.get(0);
                     String directory = elements.get(1);
                     settingRepository.load(scheme, host, category, directory)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(setting -> onSuccessCallback.onSuccess(setting.getTitle()),
+                            .subscribe(setting -> {
+                                        String title = setting.getTitle();
+                                        if (TextUtils.isEmpty(title)) {
+                                            EventBus.getDefault().post(new ErrorEvent("板名を取得できませんでした"));
+                                        } else {
+                                            EventBus.getDefault().post(new SuccessEvent(title));
+                                        }
+                                    },
                                     throwable -> {
                                         Timber.d(throwable);
-                                        onErrorCallback.onError(throwable.getMessage());
+                                        EventBus.getDefault().post(new ErrorEvent(throwable.getMessage()));
                                     });
                 } else {
-                    onErrorCallback.onError("不正なURLです");
+                    EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 }
             } else {
                 if (elements.size() == 1) {
                     // TODO
                     return;
                 } else {
-                    onErrorCallback.onError("不正なURLです");
+                    EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 }
             }
         } catch (URISyntaxException e) {
             Timber.d(e);
-            onErrorCallback.onError("不正なURLです");
+            EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
         }
 
+    }
+
+    public static class SuccessEvent {
+        @NonNull
+        private String title;
+
+        private SuccessEvent(@NonNull String title) {
+            this.title = title;
+        }
+
+        @NonNull
+        public String getTitle() {
+            return title;
+        }
+    }
+
+    public static class ErrorEvent {
+        @NonNull
+        private String message;
+
+        private ErrorEvent(@NonNull String message) {
+            this.message = message;
+        }
+
+        @NonNull
+        public String getMessage() {
+            return message;
+        }
     }
 
 }

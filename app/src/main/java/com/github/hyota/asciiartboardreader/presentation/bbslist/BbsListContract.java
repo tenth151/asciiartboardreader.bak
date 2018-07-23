@@ -26,7 +26,9 @@ public interface BbsListContract {
 
     interface Presenter {
 
-        void load();
+        void onStart();
+
+        void onStop();
 
         void onAddButtonClick();
 

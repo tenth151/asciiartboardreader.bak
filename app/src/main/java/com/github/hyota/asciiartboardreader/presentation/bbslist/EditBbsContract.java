@@ -23,6 +23,10 @@ public interface EditBbsContract {
 
     interface Presenter {
 
+        void onStart();
+
+        void onStop();
+
         void onOk(long id, long sort, @NonNull String title, @NonNull String url);
 
         void onDelete(long id);

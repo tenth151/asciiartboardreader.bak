@@ -177,6 +177,18 @@ public class EditBbsDialogFragment extends DialogFragment implements EditBbsCont
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (unbinder != null) {

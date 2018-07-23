@@ -10,6 +10,9 @@ import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.BbsInfoRepository;
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
+import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,14 +31,6 @@ public class EditBbsUseCase {
     @NonNull
     private SettingRepository settingRepository;
 
-    public interface OnSuccessCallback {
-        void onSuccess(@NonNull BbsInfo bbsInfo, boolean create);
-    }
-
-    public interface OnErrorCallback {
-        void onError(@NonNull String message);
-    }
-
     @Inject
     EditBbsUseCase(@NonNull BbsInfoRepository bbsInfoRepository, @NonNull SettingRepository settingRepository) {
         this.bbsInfoRepository = bbsInfoRepository;
@@ -43,10 +38,9 @@ public class EditBbsUseCase {
     }
 
     @SuppressLint("CheckResult")
-    public void execute(long id, long sort, @NonNull String title, @NonNull String url,
-                        @NonNull OnSuccessCallback onSuccessCallback, @NonNull OnErrorCallback onErrorCallback) {
+    public void execute(long id, long sort, @NonNull String title, @NonNull String url) {
         if (TextUtils.isEmpty(url)) {
-            onErrorCallback.onError("URLの入力がありません");
+            EventBus.getDefault().post(new ErrorEvent("URLの入力がありません"));
             return;
         }
         try {
@@ -55,84 +49,81 @@ public class EditBbsUseCase {
             String scheme = uri.getScheme();
             if (!"http".equals(scheme) && !"https".equals(scheme)) {
                 Timber.d("scheme is invalidate. %s", scheme);
-                onErrorCallback.onError("不正なURLです");
+                EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 return;
             }
             String host = uri.getHost();
             if (host == null) {
                 Timber.d("host is null");
-                onErrorCallback.onError("不正なURLです");
+                EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 return;
             }
             String path = uri.getPath();
             if (path == null) {
                 Timber.d("path is null");
-                onErrorCallback.onError("不正なURLです");
+                EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 return;
             }
             List<String> elements = Stream.of(path.split("/")).filter(it -> !TextUtils.isEmpty(it)).collect(Collectors.toList());
-            if ("jbbs.shitaraba.net".equals(host)) { // したらばの場合
+            if (ShitarabaConstant.HOST.equals(host)) { // したらばの場合
                 if (elements.size() == 2) {
                     String category = elements.get(0);
                     String directory = elements.get(1);
                     settingRepository.load(scheme, host, category, directory)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(setting -> validDuplicatedUrl(id, sort, title, scheme, host, category, directory, onSuccessCallback, onErrorCallback),
-                                    throwable -> onErrorCallback.onError(throwable.getMessage()));
+                            .subscribe(setting -> validDuplicatedUrl(id, sort, title, scheme, host, category, directory),
+                                    throwable -> EventBus.getDefault().post(new ErrorEvent(throwable.getMessage())));
                 } else {
-                    onErrorCallback.onError("不正なURLです");
+                    EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 }
             } else {
                 if (elements.size() != 1) {
                     // TODO
                 } else {
-                    onErrorCallback.onError("不正なURLです");
+                    EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
                 }
             }
         } catch (URISyntaxException e) {
             Timber.d(e);
-            onErrorCallback.onError("不正なURLです");
+            EventBus.getDefault().post(new ErrorEvent("不正なURLです"));
         }
 
     }
 
     @SuppressLint("CheckResult")
-    private void validDuplicatedUrl(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory,
-                                    @NonNull OnSuccessCallback onSuccessCallback, @NonNull OnErrorCallback onErrorCallback) {
+    private void validDuplicatedUrl(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
         bbsInfoRepository.findByUrl(scheme, host, category, directory)
                 .subscribe(entity -> {
                             if (entity.getId() != id) {
-                                onErrorCallback.onError("登録済みのURLです");
+                                EventBus.getDefault().post(new ErrorEvent("登録済みのURLです"));
                             } else {
-                                validTitle(id, sort, title, scheme, host, category, directory, onSuccessCallback, onErrorCallback);
+                                validTitle(id, sort, title, scheme, host, category, directory);
                             }
                         }, IllegalStateException::new,
-                        () -> validTitle(id, sort, title, scheme, host, category, directory, onSuccessCallback, onErrorCallback));
+                        () -> validTitle(id, sort, title, scheme, host, category, directory));
     }
 
     @SuppressLint("CheckResult")
-    private void validTitle(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory,
-                            @NonNull OnSuccessCallback onSuccessCallback, @NonNull OnErrorCallback onErrorCallback) {
+    private void validTitle(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
         if (TextUtils.isEmpty(title)) {
-            onErrorCallback.onError("タイトルの入力がありません");
+            EventBus.getDefault().post(new ErrorEvent("タイトルの入力がありません"));
             return;
         }
         bbsInfoRepository.findByTitle(title)
                 .subscribe(entity -> {
                             if (entity.getId() != id) {
-                                onErrorCallback.onError("登録済みの板名です");
+                                EventBus.getDefault().post(new ErrorEvent("登録済みの板名です"));
                             } else {
-                                save(id, sort, title, scheme, host, category, directory, onSuccessCallback, onErrorCallback);
+                                save(id, sort, title, scheme, host, category, directory);
                             }
                         }, IllegalStateException::new,
-                        () -> save(id, sort, title, scheme, host, category, directory, onSuccessCallback, onErrorCallback));
+                        () -> save(id, sort, title, scheme, host, category, directory));
 
     }
 
     @SuppressLint("CheckResult")
-    private void save(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory,
-                      @NonNull OnSuccessCallback onSuccessCallback, @NonNull OnErrorCallback onErrorCallback) {
+    private void save(long id, long sort, @NonNull String title, @NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
         BbsInfo bbsInfo;
         boolean create = id == -1;
         if (create) {
@@ -143,6 +134,44 @@ public class EditBbsUseCase {
         bbsInfoRepository.save(bbsInfo)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> onSuccessCallback.onSuccess(result, create), throwable -> onErrorCallback.onError(throwable.getMessage()));
+                .subscribe(
+                        result -> EventBus.getDefault().post(new SuccessEvent(result, create)),
+                        throwable -> EventBus.getDefault().post(new ErrorEvent(throwable.getMessage()))
+                );
     }
+
+    public static class SuccessEvent {
+        @NonNull
+        private BbsInfo bbsInfo;
+        private boolean create;
+
+        private SuccessEvent(@NonNull BbsInfo bbsInfo, boolean create) {
+            this.bbsInfo = bbsInfo;
+            this.create = create;
+        }
+
+        @NonNull
+        public BbsInfo getBbsInfo() {
+            return bbsInfo;
+        }
+
+        public boolean isCreate() {
+            return create;
+        }
+    }
+
+    public static class ErrorEvent {
+        @NonNull
+        private String message;
+
+        private ErrorEvent(@NonNull String message) {
+            this.message = message;
+        }
+
+        @NonNull
+        public String getMessage() {
+            return message;
+        }
+    }
+
 }

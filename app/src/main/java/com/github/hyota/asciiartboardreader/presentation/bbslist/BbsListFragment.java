@@ -3,7 +3,6 @@ package com.github.hyota.asciiartboardreader.presentation.bbslist;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -33,14 +32,11 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     @Inject
     BbsListContract.Presenter presenter;
     @BindView(R.id.list)
-    @Nullable
     RecyclerView recyclerView;
     @BindView(R.id.fab)
-    @Nullable
     FloatingActionButton addBbsButton;
 
     private Context context;
-    @Nullable
     private Unbinder unbinder;
     private BbsRecyclerViewAdapter adapter;
     private OnBbsSelectListener listener;
@@ -71,26 +67,29 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bbs_list, container, false);
         unbinder = ButterKnife.bind(this, view);
-        if (addBbsButton != null) {
-            addBbsButton.setOnClickListener(v -> presenter.onAddButtonClick());
-        }
-
-        if (recyclerView != null) {
-            RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-            recyclerView.addItemDecoration(itemDecoration);
-        }
-
-        presenter.load();
+        addBbsButton.setOnClickListener(v -> presenter.onAddButtonClick());
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
 
         return view;
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null) {
-            unbinder.unbind();
-        }
+        unbinder.unbind();
     }
 
     @Override
@@ -102,10 +101,8 @@ public class BbsListFragment extends Fragment implements BbsListContract.View, E
     @Override
     public void setData(@NonNull List<BbsInfo> bbsInfoList) {
         Timber.d("setData");
-        if (recyclerView != null) {
-            adapter = new BbsRecyclerViewAdapter(bbsInfoList, listener::onBbsSelect, presenter::onBbsLongClick);
-            recyclerView.setAdapter(adapter);
-        }
+        adapter = new BbsRecyclerViewAdapter(bbsInfoList, listener::onBbsSelect, presenter::onBbsLongClick);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
