@@ -1,6 +1,8 @@
 package com.github.hyota.asciiartboardreader.di;
 
 import com.github.hyota.asciiartboardreader.data.datasource.BbsInfoDataSource;
+import com.github.hyota.asciiartboardreader.data.datasource.DatLocalDataSource;
+import com.github.hyota.asciiartboardreader.data.datasource.DatRemoteDataSource;
 import com.github.hyota.asciiartboardreader.data.datasource.FavoriteThreadDataSource;
 import com.github.hyota.asciiartboardreader.data.datasource.HistoryDataSource;
 import com.github.hyota.asciiartboardreader.data.datasource.SettingLocalDataSource;
@@ -10,8 +12,10 @@ import com.github.hyota.asciiartboardreader.data.datasource.SubjectRemoteDataSou
 import com.github.hyota.asciiartboardreader.data.db.room.BbsInfoRoomDataSource;
 import com.github.hyota.asciiartboardreader.data.db.room.FavoriteThreadRoomDataSource;
 import com.github.hyota.asciiartboardreader.data.db.room.HistoryRoomDataSource;
+import com.github.hyota.asciiartboardreader.data.local.DatLocalFileDataSource;
 import com.github.hyota.asciiartboardreader.data.local.SettingLocalFileDataSource;
 import com.github.hyota.asciiartboardreader.data.local.SubjectLocalFileDataSource;
+import com.github.hyota.asciiartboardreader.data.network.retrofit.DatNetworkDataSource;
 import com.github.hyota.asciiartboardreader.data.network.retrofit.SettingNetworkDataSource;
 import com.github.hyota.asciiartboardreader.data.network.retrofit.SubjectNetworkDataSource;
 
@@ -44,6 +48,18 @@ public class DataSourceModule {
     @Provides
     @Singleton
     SubjectRemoteDataSource provideSubjectRemoteDataSource(SubjectNetworkDataSource dataSource) {
+        return dataSource;
+    }
+
+    @Provides
+    @Singleton
+    DatLocalDataSource provideDatLocalDataSource(DatLocalFileDataSource dataSource) {
+        return dataSource;
+    }
+
+    @Provides
+    @Singleton
+    DatRemoteDataSource provideDatRemoteDataSource(DatNetworkDataSource dataSource) {
         return dataSource;
     }
 

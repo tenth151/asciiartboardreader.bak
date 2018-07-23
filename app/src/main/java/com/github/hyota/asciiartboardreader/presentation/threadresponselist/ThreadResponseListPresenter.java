@@ -34,7 +34,7 @@ public class ThreadResponseListPresenter implements ThreadResponseListContract.P
     public void onCreate(@NonNull ThreadInfo threadInfo) {
         this.threadInfo = threadInfo;
         // TODO あぼーんとのマージ
-        datRepository.findByUrl(threadInfo.getBbsInfo().getScheme(), threadInfo.getBbsInfo().getHost(), threadInfo.getBbsInfo().getCategory(), threadInfo.getBbsInfo().getDirectory(), threadInfo.getUnixTime())
+        datRepository.load(threadInfo)
                 .subscribeOn(Schedulers.newThread())
                 .map(dat -> Stream.of(dat.getThreadResponseList())
                         .map(threadResponse -> new ResponseInfo(threadResponse.getNo(), threadResponse.getName(), threadResponse.getEmail(), threadResponse.getDateTime(), threadResponse.getContent(), threadResponse.getTitle(), threadResponse.getId(), threadInfo))

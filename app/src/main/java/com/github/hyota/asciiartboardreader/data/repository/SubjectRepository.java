@@ -34,7 +34,7 @@ public class SubjectRepository {
     private SubjectRemoteDataSource remoteDataSource;
 
     @Inject
-    public SubjectRepository(@NonNull SubjectLocalDataSource localDataSource, @NonNull SubjectRemoteDataSource remoteDataSource) {
+    SubjectRepository(@NonNull SubjectLocalDataSource localDataSource, @NonNull SubjectRemoteDataSource remoteDataSource) {
         this.localDataSource = localDataSource;
         this.remoteDataSource = remoteDataSource;
     }

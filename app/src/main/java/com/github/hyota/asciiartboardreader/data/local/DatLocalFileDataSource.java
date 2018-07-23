@@ -2,27 +2,26 @@ package com.github.hyota.asciiartboardreader.data.local;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.R;
-import com.github.hyota.asciiartboardreader.data.repository.DatRepository;
-import com.github.hyota.asciiartboardreader.domain.model.Dat;
+import com.github.hyota.asciiartboardreader.data.datasource.DatLocalDataSource;
+import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 
 import javax.inject.Inject;
 
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-public class DatLocalFileDataSource implements DatRepository, LocalFileDataSource {
+public class DatLocalFileDataSource implements DatLocalDataSource, LocalFileDataSource {
 
     @NonNull
     private Context context;
@@ -32,22 +31,24 @@ public class DatLocalFileDataSource implements DatRepository, LocalFileDataSourc
         this.context = context;
     }
 
+    @NonNull
     @Override
-    public Maybe<Dat> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, long unixTime) {
-        return Maybe.create(e -> {
-            File file = getFile(context.getString(R.string.app_name), host, category, directory, unixTime);
+    public Single<File> load(@NonNull ThreadInfo threadInfo) {
+        return Single.create(e -> {
+            File file = getFile(context.getString(R.string.app_name), threadInfo);
             if (file.exists()) {
-                e.onSuccess(parse(file, host));
+                e.onSuccess(file);
             } else {
-                e.onComplete();
+                e.onError(new FileNotFoundException());
             }
         });
     }
 
+    @NonNull
     @Override
-    public Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, long unixTime, @NonNull Source source) {
+    public Single<File> save(@NonNull ThreadInfo threadInfo, @NonNull Source source) {
         return Single.create(e -> {
-            File dst = getFile(context.getString(R.string.app_name), host, category, directory, unixTime);
+            File dst = getFile(context.getString(R.string.app_name), threadInfo);
             if (!dst.getParentFile().exists() && !dst.getParentFile().mkdirs()) {
                 throw new IllegalStateException("failed mkdirs " + dst.getParentFile().getAbsolutePath());
             }
@@ -58,8 +59,8 @@ public class DatLocalFileDataSource implements DatRepository, LocalFileDataSourc
         });
     }
 
-    private File getFile(@NonNull String appName, @NonNull String host, @NonNull String category, @Nullable String directory, long unixTime) throws IOException {
-        return new File(new File(getLocalDirectory(appName), URLEncoder.encode(Stream.of(host, category, directory).collect(Collectors.joining("/")), "UTF-8")), unixTime + ".dat");
+    private File getFile(@NonNull String appName, @NonNull ThreadInfo threadInfo) throws IOException {
+        return new File(new File(getLocalDirectory(appName), URLEncoder.encode(Stream.of(threadInfo.getBbsInfo().getHost(), threadInfo.getBbsInfo().getCategory(), threadInfo.getBbsInfo().getDirectory()).collect(Collectors.joining("/")), "UTF-8")), threadInfo.getUnixTime() + ".dat");
     }
 
 }

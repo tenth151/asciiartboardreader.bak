@@ -1,18 +1,17 @@
 package com.github.hyota.asciiartboardreader.data.repository;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import com.github.hyota.asciiartboardreader.data.datasource.DatLocalDataSource;
+import com.github.hyota.asciiartboardreader.data.datasource.DatRemoteDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.Dat;
-import com.github.hyota.asciiartboardreader.domain.model.Subject;
+import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadResponse;
-import com.github.hyota.asciiartboardreader.domain.model.ThreadSubject;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
-import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.io.BufferedReader;
@@ -21,28 +20,48 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Maybe;
+import javax.inject.Inject;
+
 import io.reactivex.Single;
-import okio.Source;
 import timber.log.Timber;
 
-public interface DatRepository {
+public class DatRepository {
 
-    Pattern SHITARABA_PATTERN = Pattern.compile("^(\\d+)<>(.*)<>(.*)<>(\\d{4}/\\d{2}/\\d{2}\\(.\\) \\d{2}:\\d{2}:\\d{2})<>(.*)<>(.*)<>(.+)$");
-    DateTimeFormatter RESPONSE_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu/MM/dd(E) HH:mm:ss", Locale.getDefault());
+    private static final Pattern SHITARABA_PATTERN = Pattern.compile("^(\\d+)<>(.*)<>(.*)<>(\\d{4}/\\d{2}/\\d{2}\\(.\\) \\d{2}:\\d{2}:\\d{2})<>(.*)<>(.*)<>(.+)$");
+    private static final DateTimeFormatter RESPONSE_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu/MM/dd(E) HH:mm:ss", Locale.getDefault());
 
-    Maybe<Dat> findByUrl(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, long unixTime);
+    @NonNull
+    private DatLocalDataSource localDataSource;
+    @NonNull
+    private DatRemoteDataSource remoteDataSource;
 
-    Single<File> save(@NonNull String host, @NonNull String category, @Nullable String directory, long unixTime, @NonNull Source source);
+    @Inject
+    DatRepository(@NonNull DatLocalDataSource localDataSource, @NonNull DatRemoteDataSource remoteDataSource) {
+        this.localDataSource = localDataSource;
+        this.remoteDataSource = remoteDataSource;
+    }
 
-    default Dat parse(@NonNull File file, @NonNull String host) throws IOException {
+    @NonNull
+    public Single<Dat> load(@NonNull ThreadInfo threadInfo) {
+        return localDataSource.load(threadInfo)
+                .onErrorResumeNext(remoteDataSource.load(threadInfo)
+                        .flatMap(sink -> localDataSource.save(threadInfo, sink)))
+                .map(file -> parse(file, threadInfo.getBbsInfo().getHost()));
+    }
+
+    @NonNull
+    public Single<Dat> loadFromRemote(@NonNull ThreadInfo threadInfo) {
+        return remoteDataSource.load(threadInfo)
+                .flatMap(sink -> localDataSource.save(threadInfo, sink))
+                .map(file -> parse(file, threadInfo.getBbsInfo().getHost()));
+    }
+
+    private Dat parse(@NonNull File file, @NonNull String host) throws IOException {
         if (ShitarabaConstant.HOST.equals(host)) {
             try (FileInputStream fis = new FileInputStream(file);
                  InputStreamReader isr = new InputStreamReader(fis, ShitarabaConstant.ENCODE);
@@ -69,4 +88,5 @@ public interface DatRepository {
             throw new IllegalStateException("not implements");
         }
     }
+
 }
