@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -29,7 +31,8 @@ public class BbsListPresenter implements BbsListContract.Presenter {
 
     private List<BbsInfo> items;
 
-    public BbsListPresenter(@NonNull BbsListContract.View view, @NonNull BbsInfoRepository bbsInfoRepository) {
+    @Inject
+    BbsListPresenter(@NonNull BbsListContract.View view, @NonNull BbsInfoRepository bbsInfoRepository) {
         this.view = view;
         this.bbsInfoRepository = bbsInfoRepository;
     }

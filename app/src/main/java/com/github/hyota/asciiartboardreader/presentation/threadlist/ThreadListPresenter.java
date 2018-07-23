@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -35,10 +37,12 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
 
     private List<ThreadInfo> items;
 
-    public ThreadListPresenter(@NonNull ThreadListContract.View view, @NonNull SubjectRepository subjectRepository, @NonNull FavoriteThreadRepository favoriteThreadRepository) {
+    @Inject
+    ThreadListPresenter(@NonNull ThreadListContract.View view, @NonNull SubjectRepository subjectRepository, @NonNull FavoriteThreadRepository favoriteThreadRepository, @NonNull HistoryRepository historyRepository) {
         this.view = view;
         this.subjectRepository = subjectRepository;
         this.favoriteThreadRepository = favoriteThreadRepository;
+        this.historyRepository = historyRepository;
     }
 
     @SuppressLint("CheckResult")

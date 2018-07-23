@@ -1,8 +1,5 @@
 package com.github.hyota.asciiartboardreader.di;
 
-import com.github.hyota.asciiartboardreader.domain.usecase.DeleteBbsUseCase;
-import com.github.hyota.asciiartboardreader.domain.usecase.EditBbsUseCase;
-import com.github.hyota.asciiartboardreader.domain.usecase.GetBbsTitleUseCase;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.EditBbsContract;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.EditBbsDialogFragment;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.EditBbsPresenter;
@@ -15,8 +12,14 @@ public class EditBbsDialogFragmentModule {
 
     @FragmentScope
     @Provides
-    EditBbsContract.Presenter providePresenter(EditBbsDialogFragment fragment, EditBbsUseCase editBbsUseCase, DeleteBbsUseCase deleteBbsUseCase, GetBbsTitleUseCase getBbsTitleUseCase) {
-        return new EditBbsPresenter(fragment, editBbsUseCase, deleteBbsUseCase, getBbsTitleUseCase);
+    EditBbsContract.View provideView(EditBbsDialogFragment fragment) {
+        return fragment;
+    }
+
+    @FragmentScope
+    @Provides
+    EditBbsContract.Presenter providePresenter(EditBbsPresenter presenter) {
+        return presenter;
     }
 
 }

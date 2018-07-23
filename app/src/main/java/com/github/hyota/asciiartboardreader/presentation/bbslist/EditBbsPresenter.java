@@ -7,6 +7,8 @@ import com.github.hyota.asciiartboardreader.domain.usecase.DeleteBbsUseCase;
 import com.github.hyota.asciiartboardreader.domain.usecase.EditBbsUseCase;
 import com.github.hyota.asciiartboardreader.domain.usecase.GetBbsTitleUseCase;
 
+import javax.inject.Inject;
+
 @FragmentScope
 public class EditBbsPresenter implements EditBbsContract.Presenter {
 
@@ -19,7 +21,8 @@ public class EditBbsPresenter implements EditBbsContract.Presenter {
     @NonNull
     private GetBbsTitleUseCase getBbsTitleUseCase;
 
-    public EditBbsPresenter(@NonNull EditBbsContract.View view, @NonNull EditBbsUseCase editBbsUseCase, @NonNull DeleteBbsUseCase deleteBbsUseCase, @NonNull GetBbsTitleUseCase getBbsTitleUseCase) {
+    @Inject
+    EditBbsPresenter(@NonNull EditBbsContract.View view, @NonNull EditBbsUseCase editBbsUseCase, @NonNull DeleteBbsUseCase deleteBbsUseCase, @NonNull GetBbsTitleUseCase getBbsTitleUseCase) {
         this.view = view;
         this.editBbsUseCase = editBbsUseCase;
         this.deleteBbsUseCase = deleteBbsUseCase;

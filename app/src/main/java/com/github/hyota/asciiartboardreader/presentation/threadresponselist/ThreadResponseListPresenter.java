@@ -11,6 +11,8 @@ import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -21,13 +23,14 @@ public class ThreadResponseListPresenter implements ThreadResponseListContract.P
     @NonNull
     private DatRepository datRepository;
 
-    public ThreadResponseListPresenter(@NonNull ThreadResponseListContract.View view, @NonNull DatRepository datRepository) {
+    private ThreadInfo threadInfo;
+    private List<ResponseInfo> items;
+
+    @Inject
+    ThreadResponseListPresenter(@NonNull ThreadResponseListContract.View view, @NonNull DatRepository datRepository) {
         this.view = view;
         this.datRepository = datRepository;
     }
-
-    private ThreadInfo threadInfo;
-    private List<ResponseInfo> items;
 
     @SuppressLint("CheckResult")
     @Override

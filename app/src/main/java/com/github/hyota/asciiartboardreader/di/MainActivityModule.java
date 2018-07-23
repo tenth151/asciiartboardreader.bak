@@ -1,14 +1,12 @@
 package com.github.hyota.asciiartboardreader.di;
 
-import android.support.annotation.NonNull;
-
 import com.github.hyota.asciiartboardreader.presentation.bbslist.BbsListFragment;
 import com.github.hyota.asciiartboardreader.presentation.bbslist.EditBbsDialogFragment;
 import com.github.hyota.asciiartboardreader.presentation.main.MainActivity;
 import com.github.hyota.asciiartboardreader.presentation.main.MainContract;
 import com.github.hyota.asciiartboardreader.presentation.main.MainPresenter;
-import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListFragment;
 import com.github.hyota.asciiartboardreader.presentation.threadlist.ThreadListFragment;
+import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListFragment;
 
 import dagger.Module;
 import dagger.Provides;
@@ -19,8 +17,14 @@ public abstract class MainActivityModule {
 
     @ActivityScope
     @Provides
-    static MainContract.Presenter providePresenter(@NonNull MainActivity activity) {
-        return new MainPresenter(activity);
+    static MainContract.View provideView(MainActivity activity) {
+        return activity;
+    }
+
+    @ActivityScope
+    @Provides
+    static MainContract.Presenter providePresenter(MainPresenter presenter) {
+        return presenter;
     }
 
     @FragmentScope

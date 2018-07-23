@@ -1,6 +1,5 @@
 package com.github.hyota.asciiartboardreader.di;
 
-import com.github.hyota.asciiartboardreader.data.repository.DatRepository;
 import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListContract;
 import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListFragment;
 import com.github.hyota.asciiartboardreader.presentation.threadresponselist.ThreadResponseListPresenter;
@@ -13,8 +12,14 @@ public class ThreadResponseListFragmentModule {
 
     @FragmentScope
     @Provides
-    ThreadResponseListContract.Presenter providePresenter(ThreadResponseListFragment fragment, DatRepository datRepository) {
-        return new ThreadResponseListPresenter(fragment, datRepository);
+    ThreadResponseListContract.View provideView(ThreadResponseListFragment fragment) {
+        return fragment;
+    }
+
+    @FragmentScope
+    @Provides
+    ThreadResponseListContract.Presenter providePresenter(ThreadResponseListPresenter presenter) {
+        return presenter;
     }
 
 }
