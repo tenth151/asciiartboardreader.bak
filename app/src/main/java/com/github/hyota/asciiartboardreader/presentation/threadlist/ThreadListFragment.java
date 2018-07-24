@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
@@ -40,7 +40,6 @@ public class ThreadListFragment extends Fragment
     @Inject
     ThreadListContract.Presenter presenter;
     @BindView(R.id.list)
-    @Nullable
     RecyclerView recyclerView;
     @BindView(R.id.dragScrollBar)
     DragScrollBar scrollBar;
@@ -86,16 +85,23 @@ public class ThreadListFragment extends Fragment
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_thread_list, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        if (recyclerView != null) {
-            RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-            recyclerView.addItemDecoration(itemDecoration);
-        }
-        if (scrollBar != null) {
-            scrollBar.setIndicator(new CustomIndicator(context), true);
-        }
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
+        scrollBar.setIndicator(new CustomIndicator(context), true);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
     }
 
     @Override
@@ -112,10 +118,8 @@ public class ThreadListFragment extends Fragment
 
     @Override
     public void setData(@NonNull List<ThreadInfo> threadInfoList) {
-        if (recyclerView != null) {
-            adapter = new ThreadListRecyclerViewAdapter(threadInfoList, threadInfo -> listener.onThreadSelect(threadInfo), (threadInfo, favorite) -> presenter.onFavoriteStateChange(threadInfo, favorite));
-            recyclerView.setAdapter(adapter);
-        }
+        adapter = new ThreadListRecyclerViewAdapter(threadInfoList, threadInfo -> listener.onThreadSelect(threadInfo), presenter::onFavoriteStateChange);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -136,6 +140,12 @@ public class ThreadListFragment extends Fragment
     @Override
     public void notifyItemChanged(int position) {
         adapter.notifyItemChanged(position);
+    }
+
+
+    @Override
+    public void showAlertMessage(@NonNull String message) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
     @Override

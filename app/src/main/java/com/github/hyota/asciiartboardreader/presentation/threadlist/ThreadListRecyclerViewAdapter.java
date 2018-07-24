@@ -39,7 +39,7 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
     }
 
     public interface OnFavoriteStateChangeListener {
-        void onFavoriteStateChange(@NonNull ThreadInfo threadInfo, boolean favorite);
+        void onFavoriteStateChange(@NonNull ThreadInfo threadInfo);
     }
 
     ThreadListRecyclerViewAdapter(@NonNull List<ThreadInfo> items, @Nullable OnThreadClickListener onThreadClickListener, @NonNull OnFavoriteStateChangeListener onFavoriteStateChangeListener) {
@@ -93,11 +93,7 @@ public class ThreadListRecyclerViewAdapter extends RecyclerView.Adapter<ThreadLi
 
         holder.favorite.setOnClickListener(view -> {
             if (onFavoriteStateChangeListener != null) {
-                boolean checked = holder.favorite.isChecked();
-                if (!checked) {
-                    holder.favorite.setChecked(true);
-                }
-                onFavoriteStateChangeListener.onFavoriteStateChange(holder.item, checked);
+                onFavoriteStateChangeListener.onFavoriteStateChange(holder.item);
             }
         });
     }

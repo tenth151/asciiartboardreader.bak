@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
+import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import org.greenrobot.eventbus.EventBus;
@@ -77,7 +78,12 @@ public class GetBbsTitleUseCase {
                                     },
                                     throwable -> {
                                         Timber.d(throwable);
-                                        EventBus.getDefault().post(new ErrorEvent(throwable.getMessage()));
+                                        if (throwable instanceof NetworkException) {
+                                            NetworkException networkException = (NetworkException) throwable;
+                                            EventBus.getDefault().post(new ErrorEvent("statusCode = " + networkException.getResponseCode() + ", " + "message = " + networkException.getMessage()));
+                                        } else {
+                                            EventBus.getDefault().post(new ErrorEvent("板名を取得できませんでした"));
+                                        }
                                     });
                 } else {
                     EventBus.getDefault().post(new ErrorEvent("不正なURLです"));

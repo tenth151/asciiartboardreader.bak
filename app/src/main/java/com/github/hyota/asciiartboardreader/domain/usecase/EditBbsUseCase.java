@@ -10,6 +10,7 @@ import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.BbsInfoRepository;
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
+import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import org.greenrobot.eventbus.EventBus;
@@ -136,8 +137,15 @@ public class EditBbsUseCase {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         result -> EventBus.getDefault().post(new SuccessEvent(result, create)),
-                        throwable -> EventBus.getDefault().post(new ErrorEvent(throwable.getMessage()))
-                );
+                        throwable -> {
+                            Timber.d(throwable);
+                            if (throwable instanceof NetworkException) {
+                                NetworkException networkException = (NetworkException) throwable;
+                                EventBus.getDefault().post(new ErrorEvent("statusCode = " + networkException.getResponseCode() + ", " + "message = " + networkException.getMessage()));
+                            } else {
+                                EventBus.getDefault().post(new ErrorEvent("保存に失敗しました"));
+                            }
+                        });
     }
 
     public static class SuccessEvent {
