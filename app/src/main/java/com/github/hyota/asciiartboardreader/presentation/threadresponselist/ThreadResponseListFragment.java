@@ -3,7 +3,6 @@ package com.github.hyota.asciiartboardreader.presentation.threadresponselist;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -35,10 +34,8 @@ public class ThreadResponseListFragment extends Fragment
     @Inject
     ThreadResponseListContract.Presenter presenter;
     @BindView(R.id.list)
-    @Nullable
     RecyclerView recyclerView;
     @BindView(R.id.dragScrollBar)
-    @Nullable
     DragScrollBar scrollBar;
 
     private Context context;
@@ -71,16 +68,23 @@ public class ThreadResponseListFragment extends Fragment
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_thread_response_list, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        if (recyclerView != null) {
-            RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-            recyclerView.addItemDecoration(itemDecoration);
-        }
-        if (scrollBar != null) {
-            scrollBar.setIndicator(new CustomIndicator(context), true);
-        }
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
+        scrollBar.setIndicator(new CustomIndicator(context), true);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
     }
 
     @Override
@@ -91,9 +95,7 @@ public class ThreadResponseListFragment extends Fragment
 
     @Override
     public void setData(@NonNull List<ResponseInfo> items) {
-        if (recyclerView != null) {
-            adapter = new ResponseRecyclerViewAdapter(items);
-            recyclerView.setAdapter(adapter);
-        }
+        adapter = new ResponseRecyclerViewAdapter(items);
+        recyclerView.setAdapter(adapter);
     }
 }

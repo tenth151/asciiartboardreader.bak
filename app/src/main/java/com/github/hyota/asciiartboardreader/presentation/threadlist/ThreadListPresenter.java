@@ -3,6 +3,7 @@ package com.github.hyota.asciiartboardreader.presentation.threadlist;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
+import com.github.hyota.asciiartboardreader.di.FragmentScope;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.usecase.ChangeFavoriteStateUseCase;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+@FragmentScope
 public class ThreadListPresenter implements ThreadListContract.Presenter {
 
     @NonNull
@@ -75,7 +77,7 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLoadThreadListErrorEvent(@NonNull LoadThreadListUseCase.ErrorEvent event) {
-        view.showAlertMessage(event.getMessge());
+        view.showAlertMessage(event.getMessage());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

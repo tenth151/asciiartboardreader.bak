@@ -19,6 +19,10 @@ public interface ThreadResponseListContract {
 
         void onCreate(@NonNull ThreadInfo threadInfo);
 
+        void onStart();
+
+        void onStop();
+
     }
 
 }

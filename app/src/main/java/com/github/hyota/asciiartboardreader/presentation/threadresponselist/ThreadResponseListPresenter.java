@@ -1,51 +1,57 @@
 package com.github.hyota.asciiartboardreader.presentation.threadresponselist;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.github.hyota.asciiartboardreader.data.repository.DatRepository;
+import com.github.hyota.asciiartboardreader.di.FragmentScope;
 import com.github.hyota.asciiartboardreader.domain.model.ResponseInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
+import com.github.hyota.asciiartboardreader.domain.usecase.LoadDatUseCase;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-
+@FragmentScope
 public class ThreadResponseListPresenter implements ThreadResponseListContract.Presenter {
 
     @NonNull
     private ThreadResponseListContract.View view;
     @NonNull
-    private DatRepository datRepository;
+    private LoadDatUseCase loadDatUseCase;
 
     private ThreadInfo threadInfo;
     private List<ResponseInfo> items;
 
     @Inject
-    ThreadResponseListPresenter(@NonNull ThreadResponseListContract.View view, @NonNull DatRepository datRepository) {
+    ThreadResponseListPresenter(@NonNull ThreadResponseListContract.View view, @NonNull LoadDatUseCase loadDatUseCase) {
         this.view = view;
-        this.datRepository = datRepository;
+        this.loadDatUseCase = loadDatUseCase;
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onCreate(@NonNull ThreadInfo threadInfo) {
         this.threadInfo = threadInfo;
-        // TODO あぼーんとのマージ
-        datRepository.load(threadInfo)
-                .subscribeOn(Schedulers.newThread())
-                .map(dat -> Stream.of(dat.getThreadResponseList())
-                        .map(threadResponse -> new ResponseInfo(threadResponse.getNo(), threadResponse.getName(), threadResponse.getEmail(), threadResponse.getDateTime(), threadResponse.getContent(), threadResponse.getTitle(), threadResponse.getId(), threadInfo))
-                        .collect(Collectors.toList()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(responseInfoList -> {
-                    items = responseInfoList;
-                    view.setData(items);
-                });
     }
+
+    @Override
+    public void onStart() {
+        EventBus.getDefault().register(this);
+        loadDatUseCase.execute(threadInfo);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLoadDatSuccessEvent(@NonNull LoadDatUseCase.SuccessEvent event) {
+        items = event.getResponseInfoList();
+        view.setData(items);
+    }
+
 }

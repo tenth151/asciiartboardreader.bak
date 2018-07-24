@@ -130,15 +130,15 @@ public class LoadThreadListUseCase {
 
     public static class ErrorEvent {
         @NonNull
-        private String messge;
+        private String message;
 
-        private ErrorEvent(@NonNull String messge) {
-            this.messge = messge;
+        private ErrorEvent(@NonNull String message) {
+            this.message = message;
         }
 
         @NonNull
-        public String getMessge() {
-            return messge;
+        public String getMessage() {
+            return message;
         }
     }
 
