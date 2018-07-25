@@ -3,10 +3,7 @@ package com.github.hyota.asciiartboardreader.data.network.retrofit;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.annimon.stream.function.BiFunction;
-import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
-
-import org.greenrobot.eventbus.EventBus;
+import com.github.hyota.asciiartboardreader.domain.model.ProgressUpdateListener;
 
 import java.io.IOException;
 
@@ -29,7 +26,7 @@ public class ProgressInterceptor implements Interceptor {
     }
 
     @Nullable
-    private BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent = null;
+    private ProgressUpdateListener progressUpdateListener;
 
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
@@ -39,8 +36,8 @@ public class ProgressInterceptor implements Interceptor {
                 .build();
     }
 
-    public void setProgressEvent(@Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
-        this.progressEvent = progressEvent;
+    public void setProgressUpdateListener(@Nullable ProgressUpdateListener progressUpdateListener) {
+        this.progressUpdateListener = progressUpdateListener;
     }
 
     private class ProgressResponseBody extends ResponseBody {
@@ -52,7 +49,7 @@ public class ProgressInterceptor implements Interceptor {
             this.responseBody = responseBody;
         }
 
-        @javax.annotation.Nullable
+        @Nullable
         @Override
         public MediaType contentType() {
             return responseBody.contentType();
@@ -89,8 +86,8 @@ public class ProgressInterceptor implements Interceptor {
                         max = (int) responseBody.contentLength();
                         progress = (int) totalBytesRead;
                     }
-                    if (progressEvent != null) {
-                        EventBus.getDefault().post(progressEvent.apply(max, progress));
+                    if (progressUpdateListener != null) {
+                        progressUpdateListener.onProgressUpdate(max, progress);
                     }
                     return bytesRead;
                 }

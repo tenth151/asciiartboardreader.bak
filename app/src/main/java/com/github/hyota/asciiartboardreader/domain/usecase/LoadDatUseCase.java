@@ -33,7 +33,7 @@ public class LoadDatUseCase {
     @SuppressLint("CheckResult")
     public void execute(@NonNull ThreadInfo threadInfo) {
         // TODO あぼーんとのマージ
-        datRepository.load(threadInfo, ProgressEvent::new)
+        datRepository.load(threadInfo, (max, progress) -> EventBus.getDefault().post(new ProgressEvent(max, progress)))
                 .subscribeOn(Schedulers.newThread())
                 .map(dat -> Stream.of(dat.getThreadResponseList())
                         .map(threadResponse -> new ResponseInfo(threadResponse.getNo(), threadResponse.getName(), threadResponse.getEmail(), threadResponse.getDateTime(), threadResponse.getContent(), threadResponse.getTitle(), threadResponse.getId(), threadInfo))

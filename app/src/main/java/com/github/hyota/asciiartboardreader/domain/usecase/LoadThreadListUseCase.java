@@ -46,7 +46,7 @@ public class LoadThreadListUseCase {
 
     @SuppressLint("CheckResult")
     public void execute(@NonNull BbsInfo bbsInfo) {
-        subjectRepository.load(bbsInfo, ProgressEvent::new)
+        subjectRepository.load(bbsInfo, (max, progress) -> EventBus.getDefault().post(new ProgressEvent(max, progress)))
                 .subscribeOn(Schedulers.newThread())
                 .map(threadSubjectList -> {
                     int index = 1;

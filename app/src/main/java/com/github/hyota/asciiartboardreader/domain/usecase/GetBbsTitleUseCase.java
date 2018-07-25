@@ -66,7 +66,7 @@ public class GetBbsTitleUseCase {
                 if (elements.size() == 2) {
                     String category = elements.get(0);
                     String directory = elements.get(1);
-                    settingRepository.load(scheme, host, category, directory, ProgressEvent::new)
+                    settingRepository.load(scheme, host, category, directory, (max, progress) -> EventBus.getDefault().post(new ProgressEvent(max, progress)))
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(setting -> {

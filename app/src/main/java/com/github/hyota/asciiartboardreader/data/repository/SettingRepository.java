@@ -3,10 +3,9 @@ package com.github.hyota.asciiartboardreader.data.repository;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.annimon.stream.function.BiFunction;
 import com.github.hyota.asciiartboardreader.data.datasource.SettingLocalDataSource;
 import com.github.hyota.asciiartboardreader.data.datasource.SettingRemoteDataSource;
-import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
+import com.github.hyota.asciiartboardreader.domain.model.ProgressUpdateListener;
 import com.github.hyota.asciiartboardreader.domain.model.Setting;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
@@ -35,16 +34,16 @@ public class SettingRepository {
     }
 
     @NonNull
-    public Single<Setting> load(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
+    public Single<Setting> load(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, @Nullable ProgressUpdateListener progressUpdateListener) {
         return localDataSource.load(scheme, host, category, directory)
-                .onErrorResumeNext(remoteDataSource.load(scheme, host, category, directory, progressEvent)
+                .onErrorResumeNext(remoteDataSource.load(scheme, host, category, directory, progressUpdateListener)
                         .flatMap(sink -> localDataSource.save(scheme, host, category, directory, sink)))
                 .map(file -> parse(file, host));
     }
 
     @NonNull
-    public Single<Setting> loadFromRemote(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
-        return remoteDataSource.load(scheme, host, category, directory, progressEvent)
+    public Single<Setting> loadFromRemote(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, @Nullable ProgressUpdateListener progressUpdateListener) {
+        return remoteDataSource.load(scheme, host, category, directory, progressUpdateListener)
                 .flatMap(sink -> localDataSource.save(scheme, host, category, directory, sink))
                 .map(file -> parse(file, host));
     }

@@ -3,10 +3,9 @@ package com.github.hyota.asciiartboardreader.data.network.retrofit;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.annimon.stream.function.BiFunction;
 import com.github.hyota.asciiartboardreader.data.datasource.DatRemoteDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
-import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
+import com.github.hyota.asciiartboardreader.domain.model.ProgressUpdateListener;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
@@ -33,8 +32,8 @@ public class DatNetworkDataSource implements DatRemoteDataSource {
 
     @NonNull
     @Override
-    public Single<Source> load(@NonNull ThreadInfo threadInfo, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
-        progressInterceptor.setProgressEvent(progressEvent);
+    public Single<Source> load(@NonNull ThreadInfo threadInfo, @Nullable ProgressUpdateListener progressUpdateListener) {
+        progressInterceptor.setProgressUpdateListener(progressUpdateListener);
         if (ShitarabaConstant.HOST.equals(threadInfo.getBbsInfo().getHost())) {
             return shitarabaService.dat(threadInfo.getBbsInfo().getCategory(), Objects.requireNonNull(threadInfo.getBbsInfo().getDirectory(), "shitaraba host must not null directory"), threadInfo.getUnixTime())
                     .map(response -> {

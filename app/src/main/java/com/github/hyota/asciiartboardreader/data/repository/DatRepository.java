@@ -3,11 +3,10 @@ package com.github.hyota.asciiartboardreader.data.repository;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.annimon.stream.function.BiFunction;
 import com.github.hyota.asciiartboardreader.data.datasource.DatLocalDataSource;
 import com.github.hyota.asciiartboardreader.data.datasource.DatRemoteDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.Dat;
-import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
+import com.github.hyota.asciiartboardreader.domain.model.ProgressUpdateListener;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadResponse;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
@@ -50,16 +49,16 @@ public class DatRepository {
     }
 
     @NonNull
-    public Single<Dat> load(@NonNull ThreadInfo threadInfo, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
+    public Single<Dat> load(@NonNull ThreadInfo threadInfo, @Nullable ProgressUpdateListener progressUpdateListener) {
         return localDataSource.load(threadInfo)
-                .onErrorResumeNext(remoteDataSource.load(threadInfo, progressEvent)
+                .onErrorResumeNext(remoteDataSource.load(threadInfo, progressUpdateListener)
                         .flatMap(sink -> localDataSource.save(threadInfo, sink)))
                 .map(file -> parse(file, threadInfo.getBbsInfo().getHost()));
     }
 
     @NonNull
-    public Single<Dat> loadFromRemote(@NonNull ThreadInfo threadInfo, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
-        return remoteDataSource.load(threadInfo, progressEvent)
+    public Single<Dat> loadFromRemote(@NonNull ThreadInfo threadInfo, @Nullable ProgressUpdateListener progressUpdateListener) {
+        return remoteDataSource.load(threadInfo, progressUpdateListener)
                 .flatMap(sink -> localDataSource.save(threadInfo, sink))
                 .map(file -> parse(file, threadInfo.getBbsInfo().getHost()));
     }
