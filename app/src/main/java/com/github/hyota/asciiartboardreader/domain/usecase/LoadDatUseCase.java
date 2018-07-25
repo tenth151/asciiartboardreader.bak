@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.DatRepository;
+import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
 import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
 import com.github.hyota.asciiartboardreader.domain.model.ResponseInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
@@ -32,7 +33,7 @@ public class LoadDatUseCase {
     @SuppressLint("CheckResult")
     public void execute(@NonNull ThreadInfo threadInfo) {
         // TODO あぼーんとのマージ
-        datRepository.load(threadInfo)
+        datRepository.load(threadInfo, ProgressEvent::new)
                 .subscribeOn(Schedulers.newThread())
                 .map(dat -> Stream.of(dat.getThreadResponseList())
                         .map(threadResponse -> new ResponseInfo(threadResponse.getNo(), threadResponse.getName(), threadResponse.getEmail(), threadResponse.getDateTime(), threadResponse.getContent(), threadResponse.getTitle(), threadResponse.getId(), threadInfo))
@@ -76,6 +77,12 @@ public class LoadDatUseCase {
         @NonNull
         public String getMessage() {
             return message;
+        }
+    }
+
+    public static class ProgressEvent extends BaseProgressEvent {
+        private ProgressEvent(int max, int progress) {
+            super(max, progress);
         }
     }
 

@@ -21,7 +21,7 @@
             tools:listitem="@layout/item_bbs_list" />
 
         <com.turingtechnologies.materialscrollbar.DragScrollBar
-            android:id="@+id/dragScrollBar"
+            android:id="@+id/drag_scroll_bar"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"

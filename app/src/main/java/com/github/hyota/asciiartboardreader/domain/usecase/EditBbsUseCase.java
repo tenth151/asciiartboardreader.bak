@@ -9,6 +9,7 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.BbsInfoRepository;
 import com.github.hyota.asciiartboardreader.data.repository.SettingRepository;
+import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
@@ -70,7 +71,7 @@ public class EditBbsUseCase {
                 if (elements.size() == 2) {
                     String category = elements.get(0);
                     String directory = elements.get(1);
-                    settingRepository.load(scheme, host, category, directory)
+                    settingRepository.load(scheme, host, category, directory, ProgressEvent::new)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(setting -> validDuplicatedUrl(id, sort, title, scheme, host, category, directory),
@@ -179,6 +180,12 @@ public class EditBbsUseCase {
         @NonNull
         public String getMessage() {
             return message;
+        }
+    }
+
+    public static class ProgressEvent extends BaseProgressEvent {
+        private ProgressEvent(int max, int progress) {
+            super(max, progress);
         }
     }
 

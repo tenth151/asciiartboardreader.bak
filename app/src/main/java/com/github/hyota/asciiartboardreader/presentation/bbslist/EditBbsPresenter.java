@@ -69,6 +69,10 @@ public class EditBbsPresenter implements EditBbsContract.Presenter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetBbsTitleProgressEvent(@NonNull GetBbsTitleUseCase.ProgressEvent event) {
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEditBbsSuccessEvent(@NonNull EditBbsUseCase.SuccessEvent event) {
         if (event.isCreate()) {
             view.created(event.getBbsInfo());

@@ -3,8 +3,10 @@ package com.github.hyota.asciiartboardreader.data.network.retrofit;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.annimon.stream.function.BiFunction;
 import com.github.hyota.asciiartboardreader.data.datasource.SettingRemoteDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
+import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import java.util.Objects;
@@ -19,15 +21,19 @@ public class SettingNetworkDataSource implements SettingRemoteDataSource {
 
     @NonNull
     private ShitarabaService shitarabaService;
+    @NonNull
+    private ProgressInterceptor progressInterceptor;
 
     @Inject
-    SettingNetworkDataSource(@NonNull ShitarabaService shitarabaService) {
+    SettingNetworkDataSource(@NonNull ShitarabaService shitarabaService, @NonNull ProgressInterceptor progressInterceptor) {
         this.shitarabaService = shitarabaService;
+        this.progressInterceptor = progressInterceptor;
     }
 
     @NonNull
     @Override
-    public Single<Source> load(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory) {
+    public Single<Source> load(@NonNull String scheme, @NonNull String host, @NonNull String category, @Nullable String directory, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
+        progressInterceptor.setProgressEvent(progressEvent);
         if (ShitarabaConstant.HOST.equals(host)) {
             return shitarabaService.setting(category, Objects.requireNonNull(directory, "shitaraba host must not null directory"))
                     .map(response -> {

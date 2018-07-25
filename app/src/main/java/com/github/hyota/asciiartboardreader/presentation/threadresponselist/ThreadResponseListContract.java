@@ -13,6 +13,10 @@ public interface ThreadResponseListContract {
 
         void setData(@NonNull List<ResponseInfo> items);
 
+        void showAlertMessage(@NonNull String message);
+
+        void updateProgress(int max, int progress);
+
     }
 
     interface Presenter {

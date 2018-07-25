@@ -1,4 +1,4 @@
-package com.github.hyota.asciiartboardreader.presentation.common;
+package com.github.hyota.asciiartboardreader.presentation.common.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

@@ -10,13 +10,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.github.hyota.asciiartboardreader.R;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
 import com.github.hyota.asciiartboardreader.domain.value.AlertDialogRequestCode;
-import com.github.hyota.asciiartboardreader.presentation.common.AlertDialogFragment;
+import com.github.hyota.asciiartboardreader.presentation.common.dialog.AlertDialogFragment;
 import com.turingtechnologies.materialscrollbar.CustomIndicator;
 import com.turingtechnologies.materialscrollbar.DragScrollBar;
 
@@ -41,8 +42,10 @@ public class ThreadListFragment extends Fragment
     ThreadListContract.Presenter presenter;
     @BindView(R.id.list)
     RecyclerView recyclerView;
-    @BindView(R.id.dragScrollBar)
+    @BindView(R.id.drag_scroll_bar)
     DragScrollBar scrollBar;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     private Context context;
     private Unbinder unbinder;
@@ -142,10 +145,15 @@ public class ThreadListFragment extends Fragment
         adapter.notifyItemChanged(position);
     }
 
-
     @Override
     public void showAlertMessage(@NonNull String message) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void updateProgress(int max, int progress) {
+        progressBar.setMax(max);
+        progressBar.setProgress(progress);
     }
 
     @Override

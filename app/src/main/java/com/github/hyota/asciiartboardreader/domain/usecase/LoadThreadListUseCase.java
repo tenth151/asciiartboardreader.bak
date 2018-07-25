@@ -8,6 +8,7 @@ import com.annimon.stream.Stream;
 import com.github.hyota.asciiartboardreader.data.repository.FavoriteThreadRepository;
 import com.github.hyota.asciiartboardreader.data.repository.HistoryRepository;
 import com.github.hyota.asciiartboardreader.data.repository.SubjectRepository;
+import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
 import com.github.hyota.asciiartboardreader.domain.model.ThreadInfo;
@@ -45,7 +46,7 @@ public class LoadThreadListUseCase {
 
     @SuppressLint("CheckResult")
     public void execute(@NonNull BbsInfo bbsInfo) {
-        subjectRepository.load(bbsInfo)
+        subjectRepository.load(bbsInfo, ProgressEvent::new)
                 .subscribeOn(Schedulers.newThread())
                 .map(threadSubjectList -> {
                     int index = 1;
@@ -139,6 +140,12 @@ public class LoadThreadListUseCase {
         @NonNull
         public String getMessage() {
             return message;
+        }
+    }
+
+    public static class ProgressEvent extends BaseProgressEvent {
+        private ProgressEvent(int max, int progress) {
+            super(max, progress);
         }
     }
 

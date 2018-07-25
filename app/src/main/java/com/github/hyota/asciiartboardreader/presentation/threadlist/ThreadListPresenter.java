@@ -81,6 +81,11 @@ public class ThreadListPresenter implements ThreadListContract.Presenter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLoadThreadListProgressEvent(@NonNull LoadThreadListUseCase.ProgressEvent event) {
+        view.updateProgress(event.getMax(), event.getProgress());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChangeFavoriteStateEvent(@NonNull ChangeFavoriteStateUseCase.Event event) {
         ThreadInfo item = Stream.of(items).filter(it -> it.getUnixTime() == event.getInfo().getUnixTime()).findFirst().orElse(null);
         if (item != null) {

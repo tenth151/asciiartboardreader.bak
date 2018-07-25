@@ -54,4 +54,14 @@ public class ThreadResponseListPresenter implements ThreadResponseListContract.P
         view.setData(items);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLoadDatErrorEvent(@NonNull LoadDatUseCase.ErrorEvent event) {
+        view.showAlertMessage(event.getMessage());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLoadDatProgressEvent(@NonNull LoadDatUseCase.ProgressEvent event) {
+        view.updateProgress(event.getMax(), event.getProgress());
+    }
+
 }

@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
+    <com.github.hyota.asciiartboardreader.presentation.common.view.AnimationProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
         android:name="com.github.hyota.asciiartboardreader.presentation.threadlist.ThreadListFragment"
@@ -16,7 +22,7 @@
         tools:listitem="@layout/item_thread_list" />
 
     <com.turingtechnologies.materialscrollbar.DragScrollBar
-        android:id="@+id/dragScrollBar"
+        android:id="@+id/drag_scroll_bar"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"

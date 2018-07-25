@@ -19,6 +19,8 @@ public interface ThreadListContract {
 
         void showAlertMessage(@NonNull String message);
 
+        void updateProgress(int max, int progress);
+
     }
 
     interface Presenter {

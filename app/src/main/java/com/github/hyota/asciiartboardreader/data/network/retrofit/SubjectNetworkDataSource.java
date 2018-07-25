@@ -1,10 +1,13 @@
 package com.github.hyota.asciiartboardreader.data.network.retrofit;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.annimon.stream.function.BiFunction;
 import com.github.hyota.asciiartboardreader.data.datasource.SubjectRemoteDataSource;
 import com.github.hyota.asciiartboardreader.domain.model.BbsInfo;
 import com.github.hyota.asciiartboardreader.domain.model.NetworkException;
+import com.github.hyota.asciiartboardreader.domain.model.BaseProgressEvent;
 import com.github.hyota.asciiartboardreader.domain.value.ShitarabaConstant;
 
 import java.util.Objects;
@@ -19,15 +22,19 @@ public class SubjectNetworkDataSource implements SubjectRemoteDataSource {
 
     @NonNull
     private ShitarabaService shitarabaService;
+    @NonNull
+    private ProgressInterceptor progressInterceptor;
 
     @Inject
-    SubjectNetworkDataSource(@NonNull ShitarabaService shitarabaService) {
+    SubjectNetworkDataSource(@NonNull ShitarabaService shitarabaService, @NonNull ProgressInterceptor progressInterceptor) {
         this.shitarabaService = shitarabaService;
+        this.progressInterceptor = progressInterceptor;
     }
 
     @NonNull
     @Override
-    public Single<Source> load(@NonNull BbsInfo bbsInfo) {
+    public Single<Source> load(@NonNull BbsInfo bbsInfo, @Nullable BiFunction<Integer, Integer, ? extends BaseProgressEvent> progressEvent) {
+        progressInterceptor.setProgressEvent(progressEvent);
         if (ShitarabaConstant.HOST.equals(bbsInfo.getHost())) {
             return shitarabaService.subject(bbsInfo.getCategory(), Objects.requireNonNull(bbsInfo.getDirectory(), "shitaraba host must not null directory"))
                     .map(response -> {
