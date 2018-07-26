@@ -26,7 +26,6 @@ import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v4.widget.ListViewCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -38,6 +37,8 @@ import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
+
+import timber.log.Timber;
 
 public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScrollingParent,
         NestedScrollingChild {
@@ -305,7 +306,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     /**
      * Simple constructor to use when creating a SwipeRefreshLayout from code.
      *
-     * @param context
+     * @param context {@link Context context}
      */
     public SwipeRefreshFromBottomLayout(@NonNull Context context) {
         this(context, null);
@@ -314,8 +315,8 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     /**
      * Constructor that is called when inflating SwipeRefreshLayout from XML.
      *
-     * @param context
-     * @param attrs
+     * @param context {@link Context context}
+     * @param attrs   {@link AttributeSet attrs}
      */
     public SwipeRefreshFromBottomLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -389,10 +390,10 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
      * @param refreshing Whether or not the view should show refresh progress.
      */
     public void setRefreshing(boolean refreshing) {
-        if (refreshing && mRefreshing != refreshing) {
+        if (refreshing && !mRefreshing) {
             // scale and show
-            mRefreshing = refreshing;
-            int endTarget = 0;
+            mRefreshing = true;
+            int endTarget;
             if (!mUsingCustomStart) {
                 endTarget = mSpinnerOffsetEnd + mOriginalOffsetTop;
             } else {
@@ -426,7 +427,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     /**
      * Pre API 11, this does an alpha animation.
      *
-     * @param progress
+     * @param progress progress
      */
     void setAnimationProgress(float progress) {
         mCircleView.setScaleX(progress);
@@ -503,7 +504,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     /**
      * Set the background color of the progress spinner disc.
      *
-     * @param color
+     * @param color color code
      */
     public void setProgressBackgroundColorSchemeColor(@ColorInt int color) {
         mCircleView.setBackgroundColor(color);
@@ -522,7 +523,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
      * The first color will also be the color of the bar that grows in response
      * to a user swipe gesture.
      *
-     * @param colorResIds
+     * @param colorResIds color resource id
      */
     public void setColorSchemeResources(@ColorRes int... colorResIds) {
         final Context context = getContext();
@@ -538,7 +539,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
      * color will also be the color of the bar that grows in response to a user
      * swipe gesture.
      *
-     * @param colors
+     * @param colors color codes
      */
     public void setColorSchemeColors(@ColorInt int... colors) {
         ensureTarget();
@@ -570,7 +571,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     /**
      * Set the distance to trigger a sync in dips
      *
-     * @param distance
+     * @param distance distance
      */
     public void setDistanceToTriggerSync(int distance) {
         mTotalDragDistance = distance;
@@ -692,7 +693,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
 
             case MotionEvent.ACTION_MOVE:
                 if (mActivePointerId == INVALID_POINTER) {
-                    Log.e(LOG_TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
+                    Timber.e("Got ACTION_MOVE event but don't have an active pointer id.");
                     return false;
                 }
 
@@ -726,6 +727,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
         if ((android.os.Build.VERSION.SDK_INT < 21 && mTarget instanceof AbsListView)
                 || (mTarget != null && !ViewCompat.isNestedScrollingEnabled(mTarget))) {
             // Nope.
+            Timber.d("requestDisallowInterceptTouchEvent Nope");
         } else {
             super.requestDisallowInterceptTouchEvent(b);
         }
@@ -734,13 +736,13 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     // NestedScrollingParent
 
     @Override
-    public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+    public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, int nestedScrollAxes) {
         return isEnabled() && !mReturningToStart && !mRefreshing
                 && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
 
     @Override
-    public void onNestedScrollAccepted(View child, View target, int axes) {
+    public void onNestedScrollAccepted(@NonNull View child, @NonNull View target, int axes) {
         // Reset the counter of how much leftover scroll needs to be consumed.
         mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
         // Dispatch up to the nested parent
@@ -750,7 +752,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     }
 
     @Override
-    public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
+    public void onNestedPreScroll(@NonNull View target, int dx, int dy, @NonNull int[] consumed) {
         // If we are in the middle of consuming, a scroll, then we want to move the spinner back up
         // before allowing the list to scroll
         if (dy > 0 && mTotalUnconsumed > 0) {
@@ -787,7 +789,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     }
 
     @Override
-    public void onStopNestedScroll(View target) {
+    public void onStopNestedScroll(@NonNull View target) {
         mNestedScrollingParentHelper.onStopNestedScroll(target);
         mNestedScrollInProgress = false;
         // Finish the spinner for nested scrolling if we ever consumed any
@@ -801,7 +803,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     }
 
     @Override
-    public void onNestedScroll(final View target, final int dxConsumed, final int dyConsumed,
+    public void onNestedScroll(@NonNull final View target, final int dxConsumed, final int dyConsumed,
                                final int dxUnconsumed, final int dyUnconsumed) {
         // Dispatch up to the nested parent first
         dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed,
@@ -860,13 +862,13 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     }
 
     @Override
-    public boolean onNestedPreFling(View target, float velocityX,
+    public boolean onNestedPreFling(@NonNull View target, float velocityX,
                                     float velocityY) {
         return dispatchNestedPreFling(velocityX, velocityY);
     }
 
     @Override
-    public boolean onNestedFling(View target, float velocityX, float velocityY,
+    public boolean onNestedFling(@NonNull View target, float velocityX, float velocityY,
                                  boolean consumed) {
         return dispatchNestedFling(velocityX, velocityY, consumed);
     }
@@ -973,7 +975,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         final int action = ev.getActionMasked();
-        int pointerIndex = -1;
+        int pointerIndex;
 
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
@@ -994,7 +996,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
             case MotionEvent.ACTION_MOVE: {
                 pointerIndex = ev.findPointerIndex(mActivePointerId);
                 if (pointerIndex < 0) {
-                    Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
+                    Timber.e("Got ACTION_MOVE event but have an invalid active pointer id.");
                     return false;
                 }
 
@@ -1014,7 +1016,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
             case MotionEvent.ACTION_POINTER_DOWN: {
                 pointerIndex = ev.getActionIndex();
                 if (pointerIndex < 0) {
-                    Log.e(LOG_TAG,
+                    Timber.e(LOG_TAG,
                             "Got ACTION_POINTER_DOWN event but have an invalid action index.");
                     return false;
                 }
@@ -1029,7 +1031,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
             case MotionEvent.ACTION_UP: {
                 pointerIndex = ev.findPointerIndex(mActivePointerId);
                 if (pointerIndex < 0) {
-                    Log.e(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
+                    Timber.e( "Got ACTION_UP event but don't have an active pointer id.");
                     return false;
                 }
 
@@ -1090,8 +1092,8 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     private final Animation mAnimateToCorrectPosition = new Animation() {
         @Override
         public void applyTransformation(float interpolatedTime, Transformation t) {
-            int targetTop = 0;
-            int endTarget = 0;
+            int targetTop;
+            int endTarget;
             if (!mUsingCustomStart) {
                 endTarget = mSpinnerOffsetEnd - Math.abs(mOriginalOffsetTop);
             } else {
@@ -1105,7 +1107,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     };
 
     void moveToStart(float interpolatedTime) {
-        int targetTop = 0;
+        int targetTop;
         targetTop = (mFrom + (int) ((mOriginalOffsetTop - mFrom) * interpolatedTime));
         int offset = targetTop - mCircleView.getTop();
         setTargetOffsetTopAndBottom(offset);
@@ -1188,7 +1190,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
      * platforms.
      */
     @SuppressLint("AppCompatCustomView")
-    static class CircleImageView extends ImageView {
+    private static class CircleImageView extends ImageView {
 
         private static final int KEY_SHADOW_COLOR = 0x1E000000;
         private static final int FILL_SHADOW_COLOR = 0x3D000000;
