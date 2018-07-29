@@ -67,7 +67,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     // where 1.0 is a full circle
     private static final float MAX_PROGRESS_ANGLE = .8f;
 
-    private static final int SCALE_DOWN_DURATION = 150;
+    private static final int SCALE_UP_DURATION = 150;
 
     private static final int ALPHA_ANIMATION_DURATION = 300;
 
@@ -137,7 +137,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
 
     private Animation mAlphaMaxAnimation;
 
-    private Animation mScaleDownToStartAnimation;
+    private Animation mScaleUpToStartAnimation;
 
     boolean mNotify;
 
@@ -454,7 +454,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
                 setAnimationProgress(1 - interpolatedTime);
             }
         };
-        mScaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
+        mScaleDownAnimation.setDuration(SCALE_UP_DURATION);
         mCircleView.setAnimationListener(listener);
         mCircleView.clearAnimation();
         mCircleView.startAnimation(mScaleDownAnimation);
@@ -1075,7 +1075,7 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
     private void animateOffsetToStartPosition(int from, AnimationListener listener) {
         if (mScale) {
             // Scale the item back down
-            startScaleDownReturnToStartAnimation(from, listener);
+            startScaleUpReturnToStartAnimation(from, listener);
         } else {
             mFrom = from;
             mAnimateToStartPosition.reset();
@@ -1120,11 +1120,11 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
         }
     };
 
-    private void startScaleDownReturnToStartAnimation(int from,
-                                                      Animation.AnimationListener listener) {
+    private void startScaleUpReturnToStartAnimation(int from,
+                                                    Animation.AnimationListener listener) {
         mFrom = from;
         mStartingScale = mCircleView.getScaleX();
-        mScaleDownToStartAnimation = new Animation() {
+        mScaleUpToStartAnimation = new Animation() {
             @Override
             public void applyTransformation(float interpolatedTime, Transformation t) {
                 float targetScale = (mStartingScale + (-mStartingScale * interpolatedTime));
@@ -1132,12 +1132,12 @@ public class SwipeRefreshFromBottomLayout extends ViewGroup implements NestedScr
                 moveToStart(interpolatedTime);
             }
         };
-        mScaleDownToStartAnimation.setDuration(SCALE_DOWN_DURATION);
+        mScaleUpToStartAnimation.setDuration(SCALE_UP_DURATION);
         if (listener != null) {
             mCircleView.setAnimationListener(listener);
         }
         mCircleView.clearAnimation();
-        mCircleView.startAnimation(mScaleDownToStartAnimation);
+        mCircleView.startAnimation(mScaleUpToStartAnimation);
     }
 
     void setTargetOffsetTopAndBottom(int offset) {
